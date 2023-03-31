@@ -24,7 +24,8 @@ class LLMModel:
         pass
 
 
-def get_model(model_name, args) -> LLMModel:
+def get_model(args) -> LLMModel:
+    model_name = args.model
     assert model_name in availabel_models
     globals()[f"get_{model_name}"]()
     try:

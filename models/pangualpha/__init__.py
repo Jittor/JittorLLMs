@@ -8,7 +8,7 @@ from megatron import get_tokenizer
 from megatron.checkpointing import load_checkpoint
 from megatron.initialize import initialize_megatron
 from megatron.model import GPT2Model
-from megatron.training import get_model
+from megatron.training import get_model as megatron_get_model
 
 from models import LLMModel
 
@@ -135,11 +135,30 @@ class PanGuAlphaModel(LLMModel):
     def __init__(self) -> None:
         super().__init__()
 
+        import sys
+        sys.argv = [sys.argv[0], 
+                    "--model-parallel-size", "1", 
+                    "--num-layers", "31", 
+                    "--hidden-size" , "2560", 
+                    "--load" , "data/pangualpha/Pangu-alpha_2.6B_mgt/", 
+                    "--num-attention-heads", "32", 
+                    "--max-position-embeddings", "1024", 
+                    "--tokenizer-type", "GPT2BPETokenizer", 
+                    # "--fp16", 
+                    "--batch-size", "1", 
+                    "--seq-length", "1024", 
+                    "--out-seq-length", "50",
+                    "--temperature", "1.0",
+                    "--vocab-file", "models/pangualpha/megatron/tokenizer/bpe_4w_pcl/vocab", 
+                    "--num-samples", "0",
+                    "--top_k", "2",
+                    "--finetune"]
+
         initialize_megatron(extra_args_provider=add_text_generate_args,
                         args_defaults={'tokenizer_type': 'GPT2BPETokenizer'})
 
         # Set up model and load checkpoint.
-        self.model = get_model(model_provider)
+        self.model = megatron_get_model(model_provider)
         self.model.eval()
 
         self.args = get_args()

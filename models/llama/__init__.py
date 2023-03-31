@@ -42,7 +42,7 @@ class LLaMAModel(LLMModel):
     def __init__(self, args) -> None:
         super().__init__()
 
-        ckpt_dir = getattr(args, "ckpt_dir", "data/llama/7B")
+        ckpt_dir = getattr(args, "ckpt_dir", "data/llama/7BJ")
         tokenizer_path = getattr(args, "tokenizer_path", "data/llama/tokenizer.model")
 
         self.generator = load(

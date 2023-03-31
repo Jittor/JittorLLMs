@@ -4,3 +4,4 @@ six
 regex
 numpy
 jieba
+sentencepiece
