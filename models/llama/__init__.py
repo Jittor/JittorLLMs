@@ -1,6 +1,7 @@
 import time
 import json
 from pathlib import Path
+import os
 
 import jittor as jt
 jt.flags.use_cuda = 1
@@ -22,7 +23,7 @@ def load(
     checkpoint = jt.load(ckpt_path)
     with open(Path(ckpt_dir) / "params.json", "r") as f:
         params = json.loads(f.read())
-
+    
     model_args: ModelArgs = ModelArgs(
         max_seq_len=max_seq_len, max_batch_size=max_batch_size, **params
     )
@@ -55,4 +56,6 @@ class LLaMAModel(LLMModel):
 
 
 def get_model(args):
+    args.ckpt_dir = os.path.join(jt.compiler.ck_path, "llama")
+    args.tokenizer_path = os.path.join(jt.compiler.ck_path, "llama", "tokenizer.model")
     return LLaMAModel(args)

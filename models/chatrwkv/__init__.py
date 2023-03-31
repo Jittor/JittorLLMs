@@ -1,4 +1,5 @@
 import jittor as jt
+import os
 jt.flags.use_cuda = 1
 
 from models import LLMModel
@@ -23,4 +24,5 @@ class ChatRWKVMdoel(LLMModel):
 
 
 def get_model(args):
+    args.ckpt_dir = os.path.join(jt.compiler.ck_path, "chatrwkv")
     return ChatRWKVMdoel(args)

@@ -27,3 +27,4 @@ dist/
 !doc/source/*
 core
 __data__
+*.bin

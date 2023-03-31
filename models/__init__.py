@@ -5,7 +5,7 @@ from pathlib import Path
 sys.path.append(str((Path(__file__).parent / 'llama' ).absolute()))
 sys.path.append(str((Path(__file__).parent / 'pangualpha').absolute()))
 sys.path.append(str((Path(__file__).parent / 'chatrwkv').absolute()))
-
+from .util import *
 
 __all__ = [
     "available_models",
@@ -27,7 +27,7 @@ class LLMModel:
 def get_model(args) -> LLMModel:
     model_name = args.model
     assert model_name in availabel_models
-
+    globals()[f"get_{model_name}"]()
     try:
         module = importlib.import_module(f"models.{model_name}")
         return module.get_model(args)
