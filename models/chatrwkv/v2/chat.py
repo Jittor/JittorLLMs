@@ -35,36 +35,53 @@ torch.backends.cuda.matmul.allow_tf32 = True
 # fp16 = good for GPU (!!! DOES NOT support CPU !!!)
 # fp32 = good for CPU
 # bf16 = worse accuracy, supports CPU
-# xxxi8 (example: fp16i8) = xxx with int8 quantization to save 50% VRAM/RAM, slower, slightly less accuracy
 #
-# Read https://pypi.org/project/rwkv/ for Strategy Guide
+# Strategy examples: (device = cpu/cuda/cuda:0/cuda:1/...)
+# Here we consider [ln_out+head] to be an extra layer, so L12-D768 model has "13" layers, L24-D2048 model has "25" layers, etc.
+#
+# 'cpu fp32' = everything on cpu fp32
+# 'cuda fp16' = everything on cuda fp16
+#
+# 'cuda fp16 *6 -> cpu fp32' = first 6 layers on cuda fp16, then on cpu fp32
+# 'cuda:0 fp16 *10 -> cuda:1 fp16 *8 -> cpu fp32' = first 10 layers on cuda:0 fp16, then 8 layers on cuda:1 fp16, then on cpu fp32
+#
+# Use '+' for STREAM mode (do it on your fastest GPU), requires some VRAM to store streamed layers
+# 'cuda fp16 *6+' = first 6 layers on cuda fp16, then stream the rest on it
+# (for best speed: try *1+ *2+ *3+ ... until you run out of VRAM)
+#
+# Extreme STREAM: 3G VRAM is enough to run RWKV 14B (slow. will be faster in future)
+# 'cuda fp16 *0+ -> cpu fp32 *1' = stream all layers on cuda fp16, then [ln_out+head] on cpu fp32
 #
 ########################################################################################################
 
 # args.strategy = 'cpu fp32'
 args.strategy = 'cuda fp16'
-# args.strategy = 'cuda fp16i8 *10 -> cuda fp16'
-# args.strategy = 'cuda fp16i8'
-# args.strategy = 'cuda fp16i8 -> cpu fp32 *10'
-# args.strategy = 'cuda fp16i8 *10 -> cuda fp16 *0+'
+# args.strategy = 'cuda fp16 *8 -> cpu fp32'
+# args.strategy = 'cuda fp16 *6+'
+# args.strategy = 'cuda fp16 *0+ -> cpu fp32 *1'
 
 os.environ["RWKV_JIT_ON"] = '1' # '1' or '0', please use torch 1.13+ and benchmark speed
-os.environ["RWKV_CUDA_ON"] = '0' # '1' to use CUDA kernel for seq mode (much faster)
+os.environ["RWKV_CUDA_ON"] = '0' #  '1' : use CUDA kernel for seq mode (much faster)
 
 CHAT_LANG = 'English' # English // Chinese // more to come
 
 # Download RWKV-4 models from https://huggingface.co/BlinkDL (don't use Instruct-test models unless you use their prompt templates)
 # Use '/' in model path, instead of '\'
 if CHAT_LANG == 'English':
-    args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-14b/RWKV-4-Pile-14B-20230228-ctx4096-test663'
-    # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-7b/RWKV-4-Pile-7B-20230109-ctx4096'
+    args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-14b/RWKV-4-Pile-14B-20230213-8019'
+    # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-7b/RWKV-4-Pile-7B-20221115-8047'
     # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-3b/RWKV-4-Pile-3B-20221110-ctx4096'
+    # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-1b5/RWKV-4-Pile-1B5-20220903-8040'
+    # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-430m/RWKV-4-Pile-430M-20220808-8066'
+    # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-169m/RWKV-4-Pile-169M-20220807-8023'
+    # args.MODEL_NAME = '/fsx/BlinkDL/CODE/_PUBLIC_/RWKV-LM/RWKV-v4neo/7-run1z/rwkv-340'
+    # args.MODEL_NAME = '/fsx/BlinkDL/CODE/_PUBLIC_/RWKV-LM/RWKV-v4neo/14b-run1/rwkv-6210'
 
 elif CHAT_LANG == 'Chinese': # testNovel系列是网文模型，请只用 +gen 指令续写。test4 系列可以问答（只用了小中文语料微调，纯属娱乐）
-    args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-7b/RWKV-4-Pile-7B-EngChn-testNovel-1535-ctx2048-20230306'
+    args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-7b/RWKV-4-Pile-7B-EngChn-testNovel-441-ctx2048-20230217'
     # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-3b/RWKV-4-Pile-3B-EngChn-testNovel-done-ctx2048-20230226'
     # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-1b5/RWKV-4-Pile-1B5-EngChn-testNovel-done-ctx2048-20230225'
-    # args.MODEL_NAME = '/fsx/BlinkDL/CODE/_PUBLIC_/RWKV-LM/RWKV-v4neo/1.5-run1z/rwkv-320'
+    # args.MODEL_NAME = '/fsx/BlinkDL/CODE/_PUBLIC_/RWKV-LM/RWKV-v4neo/7-run1z/rwkv-1341'
 
 PROMPT_FILE = f'{current_path}/prompt/default/{CHAT_LANG}-2.py' # -1.py for [User & Bot] (Q&A) prompt, -2.py for [Bob & Alice] (chat) prompt
 
@@ -73,12 +90,8 @@ CHAT_LEN_SHORT = 40
 CHAT_LEN_LONG = 150
 FREE_GEN_LEN = 200
 
-# For better chat & QA quality: reduce temp, reduce top-p, increase repetition penalties
-# Explanation: https://platform.openai.com/docs/api-reference/parameter-details
 GEN_TEMP = 1.0
 GEN_TOP_P = 0.85
-GEN_alpha_presence = 0.2 # Presence Penalty
-GEN_alpha_frequency = 0.2 # Frequency Penalty
 AVOID_REPEAT = '，。：？！'
 
 ########################################################################################################
@@ -237,21 +250,12 @@ def on_message(message):
 
         begin = len(model_tokens)
         out_last = begin
-        occurrence = {}
         for i in range(FREE_GEN_LEN+100):
-            for n in occurrence:
-                out[n] -= (GEN_alpha_presence + occurrence[n] * GEN_alpha_frequency)
             token = pipeline.sample_logits(
                 out,
                 temperature=x_temp,
                 top_p=x_top_p,
             )
-            if token not in occurrence:
-                occurrence[token] = 1
-            else:
-                occurrence[token] += 1
-            occurrence[187] = 0
-
             if msg[:4].lower() == '+qa ':# or msg[:4].lower() == '+qq ':
                 out = run_rnn([token], newline_adj=-2)
             else:
@@ -285,7 +289,6 @@ def on_message(message):
         begin = len(model_tokens)
         out_last = begin
         print(f'{bot}{interface}', end='', flush=True)
-        occurrence = {}
         for i in range(999):
             if i <= 0:
                 newline_adj = -999999999
@@ -295,20 +298,11 @@ def on_message(message):
                 newline_adj = 0
             else:
                 newline_adj = (i - CHAT_LEN_LONG) * 0.25 # MUST END THE GENERATION
-
-            for n in occurrence:
-                out[n] -= (GEN_alpha_presence + occurrence[n] * GEN_alpha_frequency)
             token = pipeline.sample_logits(
                 out,
                 temperature=x_temp,
                 top_p=x_top_p,
             )
-            if token not in occurrence:
-                occurrence[token] = 1
-            else:
-                occurrence[token] += 1
-            occurrence[187] = 0
-            
             out = run_rnn([token], newline_adj=newline_adj)
 
             xxx = pipeline.decode(model_tokens[out_last:])
@@ -358,22 +352,34 @@ elif CHAT_LANG == 'Chinese':
     HELP_MSG = f'''指令:
 直接输入内容 --> 和机器人聊天（建议问机器人问题），用\\n代表换行
 + --> 让机器人换个回答
-+reset --> 重置对话，请经常使用 +reset 重置机器人记忆
++reset --> 重置对话
+
++gen 某某内容 --> 续写任何中英文内容，用\\n代表换行
 +qa 某某问题 --> 问独立的问题（忽略上下文），用\\n代表换行
 +qq 某某问题 --> 问独立的问题（忽略上下文），且敞开想象力，用\\n代表换行
-
-注意，中文网文【testNovel】模型，更适合下列指令：
-+gen 某某内容 --> 续写任何中英文内容，用\\n代表换行
 +++ --> 继续 +gen / +qa / +qq 的回答
 ++ --> 换个 +gen / +qa / +qq 的回答
 
 作者：彭博 请关注我的知乎: https://zhuanlan.zhihu.com/p/603840957
 如果喜欢，请看我们的优质护眼灯: https://withablink.taobao.com
+现在可以输入内容和机器人聊天（注意它不大懂中文，它更懂英文）。请经常使用 +reset 重置机器人记忆。
+目前没有“重复惩罚”，所以机器人有时会重复，此时必须使用 + 换成正常回答，以免污染电脑记忆。
+注意：和上下文无关的独立问题，必须用 +qa 或 +qq 问，以免污染电脑记忆。
 
-中文网文【testNovel】模型，请先试这些续写例子：
-+gen “区区
+请先试下列咒语，理解咒语的写法。咒语至关重要。
+
+中文网文【testNovel】模型，试下面这些，注意，必须是【testNovel】模型：
++gen 这是一颗
 +gen 以下是不朽的科幻史诗长篇巨著，描写细腻，刻画了数百位个性鲜明的英雄和宏大的星际文明战争。\\n第一章
 +gen 这是一个修真世界，详细世界设定如下：\\n1.
+
+中文问答【test数字】模型，试下面这些，注意，必须是【test数字】模型：
++gen \\n活动出席发言稿：\\n大家好，
++gen \\n怎样创立一家快速盈利的AI公司：\\n1.
++gen \\nimport torch
++qq 请以《我的驴》为题写一篇作文
++qq 请以《企鹅》为题写一首诗歌
++qq 请设定一个奇幻世界，告诉我详细的世界设定。
 '''
 print(HELP_MSG)
 print(f'{CHAT_LANG} - {args.MODEL_NAME} - {args.strategy}')

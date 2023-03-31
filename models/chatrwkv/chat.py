@@ -16,26 +16,14 @@ print('\n\nChatRWKV project: https://github.com/BlinkDL/ChatRWKV')
 for i in range(10):
     print('NOTE: This code is v1 and only for reference. Use v2 instead.')
 
-import torch
-torch.backends.cudnn.benchmark = True
-torch.backends.cudnn.allow_tf32 = True
-torch.backends.cuda.matmul.allow_tf32 = True
-
-# Tune these below (test True/False for all of them) to find the fastest setting:
-# torch._C._jit_set_profiling_executor(True)
-# torch._C._jit_set_profiling_mode(True)
-# torch._C._jit_override_can_fuse_on_cpu(True)
-# torch._C._jit_override_can_fuse_on_gpu(True)
-# torch._C._jit_set_texpr_fuser_enabled(False)
-# torch._C._jit_set_nvfuser_enabled(False)
+import jittor as jt
+jt.flags.use_cuda = 1
 
 ########################################################################################################
 
 args.RUN_DEVICE = "cuda"  # cuda // cpu
 # fp16 (good for GPU, does NOT support CPU) // fp32 (good for CPU) // bf16 (worse accuracy, supports CPU)
-args.FLOAT_MODE = "fp16"
-
-os.environ["RWKV_JIT_ON"] = '1' # '1' or '0', please use torch 1.13+ and benchmark speed
+args.FLOAT_MODE = "fp32"
 
 CHAT_LANG = 'Chinese' # English // Chinese // more to come
 
@@ -45,18 +33,17 @@ QA_PROMPT = False # True: Q & A prompt // False: User & Bot prompt
 # Download RWKV-4 models from https://huggingface.co/BlinkDL (don't use Instruct-test models unless you use their prompt templates)
 
 if CHAT_LANG == 'English':
-    args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-14b/RWKV-4-Pile-14B-20230228-ctx4096-test663'
-    # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-7b/RWKV-4-Pile-7B-20221115-8047'
-    # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-3b/RWKV-4-Pile-3B-20221110-ctx4096'
-    # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-1b5/RWKV-4-Pile-1B5-20220903-8040'
-    # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-430m/RWKV-4-Pile-430M-20220808-8066'
-    # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-169m/RWKV-4-Pile-169M-20220807-8023'
-    # args.MODEL_NAME = '/fsx/BlinkDL/CODE/_PUBLIC_/RWKV-LM/RWKV-v4neo/7-run1z/rwkv-340'
-    # args.MODEL_NAME = '/fsx/BlinkDL/CODE/_PUBLIC_/RWKV-LM/RWKV-v4neo/14b-run1/rwkv-6210'
+    args.MODEL_PATH = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-14b/RWKV-4-Pile-14B-20230213-8019'
+    # args.MODEL_PATH = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-7b/RWKV-4-Pile-7B-20221115-8047'
+    # args.MODEL_PATH = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-3b/RWKV-4-Pile-3B-20221110-ctx4096'
+    # args.MODEL_PATH = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-1b5/RWKV-4-Pile-1B5-20220903-8040'
+    # args.MODEL_PATH = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-430m/RWKV-4-Pile-430M-20220808-8066'
+    # args.MODEL_PATH = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-169m/RWKV-4-Pile-169M-20220807-8023'
+    # args.MODEL_PATH = '/fsx/BlinkDL/CODE/_PUBLIC_/RWKV-LM/RWKV-v4neo/7-run1z/rwkv-340'
+    # args.MODEL_PATH = '/fsx/BlinkDL/CODE/_PUBLIC_/RWKV-LM/RWKV-v4neo/14b-run1/rwkv-6210'
 
 elif CHAT_LANG == 'Chinese': # testNovel系列是网文模型，请只用 +gen 指令续写。test4 系列可以问答（只用了小中文语料微调，纯属娱乐）
-    args.MODEL_NAME = 'RWKV-4-Pile-3B-EngChn-test4-20230115'
-    # args.MODEL_NAME = 'RWKV-4-Pile-7B-EngChn-test4-20230116'
+    args.MODEL_PATH = '/mnt/disk3/lzn/JittorLLM/data/chatrwkv/RWKV-4-Pile-3B-EngChn-test4-20230115-fp32.pth'
     # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-7b/RWKV-4-Pile-7B-EngChn-testNovel-441-ctx2048-20230217'
     # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-3b/RWKV-4-Pile-3B-EngChn-testNovel-711-ctx2048-20230216'
     # args.MODEL_NAME = '/fsx/BlinkDL/HF-MODEL/rwkv-4-pile-1b5/RWKV-4-Pile-1B5-EngChn-testNovel-671-ctx2048-20230216'
@@ -89,7 +76,7 @@ args.head_qk = 0
 args.pre_ffn = 0
 args.grad_cp = 0
 args.my_pos_emb = 0
-MODEL_NAME = args.MODEL_NAME
+MODEL_PATH = args.MODEL_PATH
 
 if CHAT_LANG == 'English':
     interface = ":"
@@ -216,7 +203,7 @@ The following is a verbose and detailed conversation between an AI assistant cal
 
 # Load Model
 
-print(f'Loading model - {MODEL_NAME}')
+print(f'Loading model - {MODEL_PATH}')
 model = RWKV_RNN(args)
 
 model_tokens = []
@@ -266,11 +253,13 @@ def load_all_stat(srv, name):
 
 # Run inference
 print(f'\nRun prompt...')
+breakpoint()
 
 out = run_rnn(tokenizer.encode(init_prompt))
 save_all_stat('', 'chat_init', out)
 gc.collect()
-torch.cuda.empty_cache()
+jt.gc()
+# torch.cuda.empty_cache()
 
 srv_list = ['dummy_server']
 for s in srv_list:
@@ -440,7 +429,7 @@ def on_message(message):
         save_all_stat(srv, 'chat', out)
 
 print(HELP_MSG)
-print(f'Ready - {CHAT_LANG} {args.RUN_DEVICE} {args.FLOAT_MODE} QA_PROMPT={QA_PROMPT} {args.MODEL_NAME}')
+print(f'Ready - {CHAT_LANG} {args.RUN_DEVICE} {args.FLOAT_MODE} QA_PROMPT={QA_PROMPT} {args.MODEL_PATH}')
 
 print(f'{tokenizer.decode(model_tokens)}'.replace(f'\n\n{bot}',f'\n{bot}'), end='')
 

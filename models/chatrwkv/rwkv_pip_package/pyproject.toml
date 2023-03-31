@@ -1,6 +1,6 @@
 [project]
 name = "rwkv"
-version = "0.2.0"
+version = "0.0.6"
 authors = [
   { name="Bo PENG" },
 ]
@@ -12,10 +12,7 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
-dependencies = [
-  'torch ~= 1.13.1',
-  'tokenizers >= 0.13.2',
-]
+
 
 [project.urls]
 "Homepage" = "https://github.com/BlinkDL/ChatRWKV"
