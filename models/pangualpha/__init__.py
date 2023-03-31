@@ -1,4 +1,4 @@
-import os
+import os, sys
 import numpy as np
 import torch
 import jittor as jt
@@ -54,7 +54,7 @@ def add_text_generate_args(parser):
     return parser
 
 
-def generate(model, context_tokens, args, tokenizer, max_num=50):
+def generate(model, context_tokens, args, tokenizer, max_num=50, begin=0):
 
     valid_length = len(context_tokens)
     context_tokens_, context_lengths = pad_batch([context_tokens],
@@ -87,7 +87,16 @@ def generate(model, context_tokens, args, tokenizer, max_num=50):
         if p_args[target_index] == tokenizer.eod or \
                 valid_length == args.seq_length-1 or cnt>=max_num:
             outputs = tokens.cpu().numpy()
-            break
+            return
+
+        if (begin > 0) and (valid_length >= begin):
+            #print(p_args[target_index])
+            character = tokenizer.convert_ids_to_tokens([int(p_args[target_index])])
+            if character == '问' or character == '答':
+                return
+            print(character, end='')
+            sys.stdout.flush()
+
         tokens[0][valid_length] = p_args[target_index]
         valid_length += 1
         cnt += 1
@@ -169,10 +178,12 @@ class PanGuAlphaModel(LLMModel):
 
     def run(self, input_text: str) -> str:
         tokenizer = get_tokenizer()
+        input_text = "问：" + input_text + "？答："
         context_tokens = tokenizer.tokenize(input_text)
-        output_ids = generate(self.model, context_tokens, self.args, tokenizer)
-        output_samples = tokenizer.convert_ids_to_tokens(output_ids.tolist())
-        return output_samples[len(input_text):]
+        output_ids = generate(self.model, context_tokens, self.args, tokenizer, 100, len(input_text))
+        #output_samples = tokenizer.convert_ids_to_tokens(output_ids.tolist())
+        #return output_samples[len(input_text):]
+        return ""
 
 
 def get_model(args):
