@@ -154,5 +154,5 @@ class PanGuAlphaModel(LLMModel):
         return output_samples[len(input_text):]
 
 
-def get_model():
+def get_model(args):
     return PanGuAlphaModel()
