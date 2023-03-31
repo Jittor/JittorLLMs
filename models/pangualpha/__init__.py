@@ -1,5 +1,7 @@
+import os
 import numpy as np
 import torch
+import jittor as jt
 
 from megatron.text_generation_utils import pad_batch, get_batch
 from megatron import get_args
@@ -140,7 +142,7 @@ class PanGuAlphaModel(LLMModel):
                     "--model-parallel-size", "1", 
                     "--num-layers", "31", 
                     "--hidden-size" , "2560", 
-                    "--load" , "data/pangualpha/Pangu-alpha_2.6B_mgt/", 
+                    "--load" , f"{os.path.join(jt.compiler.ck_path, 'pangu', 'Pangu-alpha_2.6B_fp16_mgt')}", 
                     "--num-attention-heads", "32", 
                     "--max-position-embeddings", "1024", 
                     "--tokenizer-type", "GPT2BPETokenizer", 

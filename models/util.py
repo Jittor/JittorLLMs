@@ -52,9 +52,9 @@ def get_pangualpha():
     path = download_fromhub(f"jittorhub://model_optim_rng.pth", tdir="pangu")
     pdir = os.path.dirname(path)
     if not os.path.exists(os.path.join(pdir, "Pangu-alpha_2.6B_fp16_mgt")):
-        f = open(os.path.join(pdir, "latest_checkpointed_iteration.txt"), "w")
-        f.write(str(1000)+"\n")
-        f.close()
         model_dir = os.path.join(pdir, "Pangu-alpha_2.6B_fp16_mgt", "iter_0001000", "mp_rank_00")
         os.makedirs(model_dir)
+        f = open(os.path.join(pdir, "Pangu-alpha_2.6B_fp16_mgt", "latest_checkpointed_iteration.txt"), "w")
+        f.write(str(1000)+"\n")
+        f.close()
         os.system(f"cd {model_dir} && ln -s {path}")
