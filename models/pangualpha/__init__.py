@@ -1,4 +1,4 @@
-import os
+import os, sys
 import numpy as np
 import torch
 import jittor as jt
@@ -54,7 +54,7 @@ def add_text_generate_args(parser):
     return parser
 
 
-def generate(model, context_tokens, args, tokenizer, max_num=50):
+def generate(model, context_tokens, args, tokenizer, max_num=50, begin=0):
 
     valid_length = len(context_tokens)
     context_tokens_, context_lengths = pad_batch([context_tokens],
@@ -87,7 +87,16 @@ def generate(model, context_tokens, args, tokenizer, max_num=50):
         if p_args[target_index] == tokenizer.eod or \
                 valid_length == args.seq_length-1 or cnt>=max_num:
             outputs = tokens.cpu().numpy()
-            break
+            return
+
+        if (begin > 0) and (valid_length >= begin):
+            #print(p_args[target_index])
+            character = tokenizer.convert_ids_to_tokens([int(p_args[target_index])])
+            if character == '问' or character == '答':
+                return
+            print(character, end='')
+            sys.stdout.flush()
+
         tokens[0][valid_length] = p_args[target_index]
         valid_length += 1
         cnt += 1
@@ -95,42 +104,6 @@ def generate(model, context_tokens, args, tokenizer, max_num=50):
     length = np.sum(outputs != tokenizer.pad_id)
     outputs = outputs[0][:length]
     return outputs
-
-
-def main():
-    """Main program."""
-
-
-    print('loading checkpoint ...')
-
-    samples = ['上联：瑞风播福泽，事业具昌盛千家乐',
-               '四川的省会是?',
-               '上联：春雨润人间，社会和谐万象新',
-               '''书生：羌笛何须怨杨柳，春风不度玉门关。
-                    飞云：（这诗怎么这么耳熟？且过去跟他聊聊如何。）
-                    书生：小兄弟，要不要一起喝一杯？
-                    飞云：你请我呀？你若是请我，我便和你喝一杯；你若不请我，我便一个人去喝。
-                    书生：小兄弟，看你年纪轻轻，不至于这么势利吧？
-                    飞云：''',
-               '张无忌拿出屠龙宝刀，手起刀落，周芷若掉了一颗门牙，身旁的赵敏喜极而泣，',
-               '人工智能成为国际竞争的新焦点。人工智能是引领未来的战略性技术，世界主要发达国家把发展人工智能作为提升国家竞争力、维护国家安全的重大战略，加紧出台规划和政策，围绕核心技术、顶尖人才、标准规范等强化部署，力图在新一轮国际科技竞争中掌握主导权。当前，',
-               '中国和美国和日本和法国和加拿大和澳大利亚的首都分别是哪里？']
-    for sample in samples:
-        raw_text = sample
-        tokenizer = get_tokenizer()
-        context_tokens = tokenizer.tokenize(raw_text)
-
-        import time
-        start = time.time()
-        output_ids = generate(model, context_tokens, args, tokenizer)
-        end = time.time()
-        output_samples = tokenizer.convert_ids_to_tokens(output_ids.tolist())
-
-        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
-        print('per token costs:', (end-start)/(len(output_ids)-len(tokenizer.tokenize(raw_text))))
-        print('Input is:', sample)
-        print('Output is:', output_samples[len(sample):], flush=True)
-        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
 
 
 class PanGuAlphaModel(LLMModel):
@@ -167,12 +140,15 @@ class PanGuAlphaModel(LLMModel):
         if self.args.load is not None:
             _ = load_checkpoint(self.model, None, None)
 
-    def run(self, input_text: str) -> str:
-        tokenizer = get_tokenizer()
-        context_tokens = tokenizer.tokenize(input_text)
-        output_ids = generate(self.model, context_tokens, self.args, tokenizer)
-        output_samples = tokenizer.convert_ids_to_tokens(output_ids.tolist())
-        return output_samples[len(input_text):]
+    def chat(self) -> str:
+        while True:
+            text = input("用户输入:")
+            tokenizer = get_tokenizer()
+            text = "问：" + text + "？答："
+            context_tokens = tokenizer.tokenize(text)
+            print("盘古α: ", end='')
+            generate(self.model, context_tokens, self.args, tokenizer, 100, len(text))
+            print("")
 
 
 def get_model(args):

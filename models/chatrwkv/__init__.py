@@ -19,8 +19,6 @@ class ChatRWKVModel(LLMModel):
         np.set_printoptions(precision=4, suppress=True, linewidth=200)
         args = types.SimpleNamespace()
 
-        print('\n\nChatRWKV project: https://github.com/BlinkDL/ChatRWKV')
-
         args.RUN_DEVICE = "cuda"  # cuda // cpu
         os.environ["RWKV_RUN_DEVICE"] = args.RUN_DEVICE
 
@@ -37,7 +35,7 @@ class ChatRWKVModel(LLMModel):
         self.GEN_TOP_P = 0.85
 
         AVOID_REPEAT = '，。：？！'
-        print(f'\nLoading ChatRWKV - {CHAT_LANG} - {args.RUN_DEVICE} - {args.FLOAT_MODE} - QA_PROMPT {QA_PROMPT}')
+        # print(f'\nLoading ChatRWKV - {CHAT_LANG} - {args.RUN_DEVICE} - {args.FLOAT_MODE} - QA_PROMPT {QA_PROMPT}')
 
 
         self.tokenizer = TOKENIZER(tokenizer_path)
@@ -146,7 +144,7 @@ The following is a verbose and detailed conversation between an AI assistant cal
         for s in srv_list:
             self.save_all_stat(s, 'chat', out)
 
-        print(f'{self.tokenizer.decode(self.model_tokens)}'.replace(f'\n\n{bot}',f'\n{bot}'), end='')
+        # print(f'{self.tokenizer.decode(self.model_tokens)}'.replace(f'\n\n{bot}',f'\n{bot}'), end='')
 
 
     def run_rnn(self, tokens, newline_adj = 0):
@@ -179,7 +177,6 @@ The following is a verbose and detailed conversation between an AI assistant cal
 
 
     def run(self, message: str) -> str:
-        message = prompt(f'{self.user}{self.interface} ')
         srv = 'dummy_server'
 
         msg = message.replace('\\n','\n').strip()
@@ -289,7 +286,7 @@ The following is a verbose and detailed conversation between an AI assistant cal
 
             begin = len(self.model_tokens)
             out_last = begin
-            print(f'{self.bot}{self.interface}', end='', flush=True)
+
             for i in range(999):
                 if i <= 0:
                     newline_adj = -999999999
@@ -319,7 +316,13 @@ The following is a verbose and detailed conversation between an AI assistant cal
 
             self.save_all_stat(srv, 'chat', out)
 
+    def chat(self):
+        while True:
+            text = input("用户输入:")
+            print("ChatRWKV: ", end="")
+            self.run(text)
+
 
 def get_model(args):
-    return ChatRWKVModel(os.path.join(jt.compiler.ck_path, "chatrwkv"),
+    return ChatRWKVModel(os.path.join(jt.compiler.ck_path, "ChatRWKV", "RWKV-4-Pile-3B-EngChn-test4-20230115-fp32.pth"),
                          "models/chatrwkv/20B_tokenizer.json")

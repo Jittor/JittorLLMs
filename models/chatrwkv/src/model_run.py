@@ -67,11 +67,11 @@ class RWKV_RNN(MyModule):
                     if print_need_newline:
                         print('\n', end = '')
                         print_need_newline = False
-                    print(x.ljust(32), str(w[x].dtype).ljust(10), shape)
+                    # print(x.ljust(32), str(w[x].dtype).ljust(10), shape)
                 else:
                     print_need_newline = True
-                    print('.', end = '', flush = True)
-        print(f'\nn_layer {args.n_layer} n_embd {args.n_embd} ctx_len {args.ctx_len}')
+                    # print('.', end = '', flush = True)
+        # print(f'\nn_layer {args.n_layer} n_embd {args.n_embd} ctx_len {args.ctx_len}')
 
         keys = list(w.keys()) # store weights in self.w
         self.w = types.SimpleNamespace()
