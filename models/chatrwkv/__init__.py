@@ -4,6 +4,7 @@ from prompt_toolkit import prompt
 
 from models import LLMModel
 import jittor as jt
+import os
 jt.flags.use_cuda = 1
 
 
@@ -320,5 +321,5 @@ The following is a verbose and detailed conversation between an AI assistant cal
 
 
 def get_model(args):
-    return ChatRWKVModel("data/chatrwkv/RWKV-4-Pile-3B-EngChn-test4-20230115-fp32.pth", 
+    return ChatRWKVModel(os.path.join(jt.compiler.ck_path, "chatrwkv"),
                          "models/chatrwkv/20B_tokenizer.json")
