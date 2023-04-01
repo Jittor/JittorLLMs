@@ -1,4 +1,5 @@
 import importlib
+import os
 import sys
 from pathlib import Path
 import traceback
@@ -30,10 +31,14 @@ class LLMModel:
 def get_model(args) -> LLMModel:
     model_name = args.model
     assert model_name in availabel_models
-    globals()[f"get_{model_name}"]()
 
     if model_name == "pangualpha":
         os.environ["log_silent"] = "1"
+    elif model_name == "llama":
+        os.environ["amp_level"] = "4"
+
+    globals()[f"get_{model_name}"]()
+
     try:
         module = importlib.import_module(f"models.{model_name}")
         return module.get_model(args)

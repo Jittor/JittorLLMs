@@ -1,10 +1,10 @@
 import os
-import jittor as jt
-from jittor import compiler
-import jittor_utils
 
 
 def download_fromhub(path, tdir=""):
+    import jittor as jt
+    from jittor import compiler
+
     tdir = tdir + '/' if tdir != "" else ""
     if path.startswith("jittorhub://"):
         path = path.replace(
