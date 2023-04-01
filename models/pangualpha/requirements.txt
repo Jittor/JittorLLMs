@@ -1,0 +1,8 @@
+jittor
+jtorch
+pybind11
+six
+regex
+numpy
+jieba
+sentencepiece

@@ -1,0 +1,2 @@
+jittor
+tokenizers>=0.13.2
