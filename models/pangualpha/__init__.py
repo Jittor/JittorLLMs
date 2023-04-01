@@ -141,9 +141,10 @@ class PanGuAlphaModel(LLMModel):
             _ = load_checkpoint(self.model, None, None)
 
     def chat(self) -> str:
+        tokenizer = get_tokenizer()
+        tokenizer.tokenize("init")
         while True:
             text = input("用户输入:")
-            tokenizer = get_tokenizer()
             text = "问：" + text + "？答："
             context_tokens = tokenizer.tokenize(text)
             print("盘古α: ", end='')
