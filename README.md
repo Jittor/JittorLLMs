@@ -27,15 +27,15 @@ python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 运行后会自动从服务器上下载模型文件到本地，会占用根目录下一定的硬盘空间。
 例如对于盘古α约为 15G。最开始运行的时候会编译一些CUDA算子，这会花费一些时间进行加载。
 
-下图是 `chatglm` 的实时对话截图：
+下图是 [ChatGLM](https://github.com/THUDM/ChatGLM-6B) 的实时对话截图：
 
 ![](./imgs/ChatGLM.gif)
 
-下图是 `盘古alpha` 的实时对话截图：
+下图是 [盘古Alpha](https://openi.org.cn/pangu/) 的实时对话截图：
 
 ![](./imgs/PanGuAlpha.gif)
 
-下图是 `chatrwkv` 的实时对话截图：
+下图是 [ChatRWKV](https://github.com/BlinkDL/ChatRWKV) 的实时对话截图：
 
 ![](./imgs/ChatRWKV.gif)
 
