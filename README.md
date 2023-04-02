@@ -15,7 +15,6 @@ Jittor大模型库架构图如下所示。
 部署只需一行命令即可：
 
 ```
-
 python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 ```
 
@@ -33,6 +32,22 @@ python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 针对大模型显存消耗大等痛点，Jittor团队研发了动态交换技术，使得Jittor框架成为世界上首个支持动态图变量自动交换功能的框架，区别于以往的基于静态图交换技术，用户不需要修改任何代码，原生的动态图代码即可直接支持张量交换，张量数据可以在显存-内存-硬盘之间自动交换，降低用户开发难度。
 
 同时，Jittor大模型推理库也是目前对配置门槛要求最低的框架，只需要参数磁盘空间和2G内存，无需显卡，也可以部署大模型，下面是在不同硬件配置条件下的资源消耗与速度对比。可以发现，JittorLLMs在显存充足的情况下，性能优于同类框架，而显存不足甚至没有显卡，JittorLLMs都能以一定速度运行。
+
+节省内存方法，请安装Jittor版本大于1.3.7.0，并添加如下环境变量：
+```bash
+export JIT_SAVE_MEM=1
+# 限制cpu最多使用16G
+export cpu_mem_limit=16000000000
+# 限制device内存（如gpu、tpu等）最多使用8G
+export device_mem_limit=8000000000
+```
+用户可以自由设定cpu和设备内存的使用量，如果不希望对内存进行限制，可以设置为`-1`。
+```bash
+# 限制cpu最多使用16G
+export cpu_mem_limit=-1
+# 限制device内存（如gpu、tpu等）最多使用8G
+export device_mem_limit=-1
+```
 
 ## 速度更快
 
