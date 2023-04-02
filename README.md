@@ -12,7 +12,7 @@ Jittor大模型库架构图如下所示。
 
 ## 部署方法
 
-可以通过下述指令安装。（注意如果使用 `ChatGLM` 的话，一定要使用 `jittor` 提供的镜像源，这里会引入一个空的 `torch` 包来摆脱 `icetk` 对 `torch` 的依赖。）
+可以通过下述指令安装依赖。（注意如果使用 `ChatGLM` 的话，一定要使用 `jittor` 提供的镜像源，这里会引入一个空的 `torch` 包来摆脱 `icetk` 对 `torch` 的依赖。）
 
 ```
 pip install -r requirements.txt -i https://pypi.jittor.org/simple
@@ -23,6 +23,9 @@ pip install -r requirements.txt -i https://pypi.jittor.org/simple
 ```
 python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 ```
+
+运行后会自动从服务器上下载模型文件到本地，会占用根目录下一定的硬盘空间。
+例如对于盘古α约为 15G。最开始运行的时候会编译一些CUDA算子，这会花费一些时间进行加载。
 
 下图是 `chatglm` 的实时对话截图：
 
