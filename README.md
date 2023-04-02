@@ -15,6 +15,9 @@ Jittor大模型库架构图如下所示。
 可以通过下述指令安装依赖。（注意如果使用 `ChatGLM` 的话，一定要使用 `jittor` 提供的镜像源，这里会引入一个空的 `torch` 包来摆脱 `icetk` 对 `torch` 的依赖。）
 
 ```
+# 国内使用 gitlink clone
+git clone https://gitlink.org.cn/jittor/JittorLLMs.git --shallow
+# github: git clone https://github.com/Jittor/JittorLLMs.git --shallow
 pip install -r requirements.txt -i https://pypi.jittor.org/simple
 ```
 
@@ -30,19 +33,19 @@ python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 下图是 [ChatGLM](https://github.com/THUDM/ChatGLM-6B) 的实时对话截图：
 
 <center>
-<img src="./imgs/ChatGLM.gif"  width="350">
+<img src="./imgs/ChatGLM2.gif"  width="350">
 </center>
 
 下图是 [盘古Alpha](https://openi.org.cn/pangu/) 的实时对话截图：
 
 <center>
-<img src="./imgs/PanGuAlpha.gif"  width="350">
+<img src="./imgs/PanGuAlpha2.gif"  width="350">
 </center>
 
 下图是 [ChatRWKV](https://github.com/BlinkDL/ChatRWKV) 的实时对话截图：
 
 <center>
-<img src="./imgs/ChatRWKV.gif"  width="350">
+<img src="./imgs/ChatRWKV2.gif"  width="350">
 </center>
 
 目前支持了 `ChatGLM` 和 盘古α 的中文对话，`ChatRWKV` 支持英文对话，后续会持续更新最新的模型参数以及微调的结果。
