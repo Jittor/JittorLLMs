@@ -104,7 +104,7 @@ pip install torch -i https://pypi.jittor.org/simple
 
 <img src="./imgs/qq.png"  width="250" height="300">
 
-# 后续计划
+## 后续计划
 
 * 移植 MOSS 大模型
 * 动态 swap 性能优化
