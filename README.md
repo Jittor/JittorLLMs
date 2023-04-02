@@ -106,6 +106,7 @@ pip install torch -i https://pypi.jittor.org/simple
 
 ## 后续计划
 
+* 模型训练与微调
 * 移植 MOSS 大模型
 * 动态 swap 性能优化
 * CPU 性能优化
