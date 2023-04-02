@@ -32,6 +32,7 @@ def load(
     model = Transformer(model_args)
     model.load_state_dict(checkpoint)
     model.half()
+    model.eval()
 
     generator = LLaMA(model, tokenizer)
     print(f"Loaded in {time.time() - start_time:.2f} seconds")
@@ -51,8 +52,16 @@ class LLaMAModel(LLMModel):
         jt.gc()
 
     def run(self, input_text: str) -> str:
-        output = self.generator.generate([input_text], max_gen_len=256, temperature=0.8, top_p=0.95)
-        return output
+        with jt.no_grad():
+            output = self.generator.generate([input_text], max_gen_len=256, temperature=0.8, top_p=0.95)
+        return output[0]
+
+    def chat(self):
+        while True:
+            input_text = input("用户输入: ")
+            input_text = input_text
+            output = self.run(input_text)
+            print("LLaMA: ", output)
 
 
 def get_model(args):

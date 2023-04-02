@@ -24,7 +24,7 @@ def get_chatrwkv():
 
 def get_llama():
     llama_file_list = [
-        'llama_consolidated.00.jt.pth',
+        'llama_consolidated.00.pth',
         'params.json',
         'tokenizer.model'
     ]
