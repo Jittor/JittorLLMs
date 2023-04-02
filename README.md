@@ -68,7 +68,7 @@ python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 
 节省内存方法，请安装Jittor版本大于1.3.7.0，并添加如下环境变量：
 ```bash
-export JIT_SAVE_MEM=1
+export JT_SAVE_MEM=1
 # 限制cpu最多使用16G
 export cpu_mem_limit=16000000000
 # 限制device内存（如gpu、tpu等）最多使用8G
