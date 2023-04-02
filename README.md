@@ -2,7 +2,7 @@
 本大模型推理库JittorLLMs有以下几个特点：
 
 1.  成本低：相比同类框架，本库可大幅降低硬件配置要求（减少80%），没有显卡，2G内存就能跑大模型，人人皆可在普通机器上，实现大模型本地部署；是目前已知的部署成本最低的大模型库；
-2.  支持广：目前支持了4种大模型：ChatGLM大模型；华为盘古大模型；blinkdl的ChatRWKV；国外Meta的LLAMA大模型；后续还将支持MOSS等国内优秀的大模型，统一运行环境配置，降低大模型用户的使用门槛。
+2.  支持广：目前支持了4种大模型：[ChatGLM大模型](https://github.com/THUDM/ChatGLM-6B)；华为[盘古大模型](https://openi.org.cn/pangu/)；BlinkDL的[ChatRWKV](https://github.com/BlinkDL/ChatRWKV)；国外Meta的[LLaMA大模型](https://github.com/facebookresearch/llama)；后续还将支持MOSS等国内优秀的大模型，统一运行环境配置，降低大模型用户的使用门槛。
 3.  可移植：用户不需要修改任何代码，只需要安装Jittor版torch(JTorch)，即可实现模型的迁移，以便于适配各类异构计算设备和环境。
 4.  速度快：大模型加载速度慢，Jittor框架通过零拷贝技术，大模型加载开销降低40%，同时，通过元算子自动编译优化，计算性能相比同类框架提升20%以上。
 
@@ -29,19 +29,25 @@ python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 
 下图是 [ChatGLM](https://github.com/THUDM/ChatGLM-6B) 的实时对话截图：
 
-![](./imgs/ChatGLM.gif)
+<center>
+<img src="./imgs/ChatGLM.gif"  width="350">
+</center>
 
 下图是 [盘古Alpha](https://openi.org.cn/pangu/) 的实时对话截图：
 
-![](./imgs/PanGuAlpha.gif)
+<center>
+<img src="./imgs/PanGuAlpha.gif"  width="350">
+</center>
 
 下图是 [ChatRWKV](https://github.com/BlinkDL/ChatRWKV) 的实时对话截图：
 
-![](./imgs/ChatRWKV.gif)
+<center>
+<img src="./imgs/ChatRWKV.gif"  width="350">
+</center>
 
 目前支持了 `ChatGLM` 和 盘古α 的中文对话，`ChatRWKV` 支持英文对话，后续会持续更新最新的模型参数以及微调的结果。
 
-之后还将提供web demo和api demo。
+之后还将提供 web demo 和 api demo。
 
 ## 配置要求低
 
