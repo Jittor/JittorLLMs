@@ -18,7 +18,9 @@ Jittor大模型库架构图如下所示。
 # 国内使用 gitlink clone
 git clone https://gitlink.org.cn/jittor/JittorLLMs.git --depth 1
 # github: git clone https://github.com/Jittor/JittorLLMs.git --depth 1
-pip install -r requirements.txt -i https://pypi.jittor.org/simple
+cd JittorLLMs
+# -i 指定用jittor的源， -I 强制重装Jittor版torch
+pip install -r requirements.txt -i https://pypi.jittor.org/simple -I
 ```
 
 部署只需一行命令即可：
