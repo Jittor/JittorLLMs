@@ -23,6 +23,8 @@ cd JittorLLMs
 pip install -r requirements.txt -i https://pypi.jittor.org/simple -I
 ```
 
+如果出现找不到jittor版本的错误，可能是您使用的镜像还没有更新，使用如下命令更新最新版：`pip install jittor -U -i https://pypi.org/simple`
+
 部署只需一行命令即可：
 
 ```
