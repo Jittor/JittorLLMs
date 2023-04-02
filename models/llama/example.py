@@ -37,6 +37,7 @@ def load(
     model = Transformer(model_args)
     model.load_state_dict(checkpoint)
     model.half()
+    model.eval()
 
     generator = LLaMA(model, tokenizer)
     print(f"Loaded in {time.time() - start_time:.2f} seconds")
@@ -83,13 +84,14 @@ plush girafe => girafe peluche
 
 cheese =>""",
     ]
-    results = generator.generate(
-        prompts, max_gen_len=256, temperature=temperature, top_p=top_p
-    )
+    with jt.no_grad():
+        results = generator.generate(
+            prompts, max_gen_len=256, temperature=temperature, top_p=top_p
+        )
 
-    for result in results:
-        print(result)
-        print("\n==================================\n")
+        for result in results:
+            print(result)
+            print("\n==================================\n")
 
 
 if __name__ == "__main__":

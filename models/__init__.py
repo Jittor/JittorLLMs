@@ -35,7 +35,7 @@ def get_model(args) -> LLMModel:
     if model_name == "pangualpha":
         os.environ["log_silent"] = "1"
     elif model_name == "llama":
-        os.environ["amp_level"] = "4"
+        os.environ["amp_level"] = "3"
 
     globals()[f"get_{model_name}"]()
 

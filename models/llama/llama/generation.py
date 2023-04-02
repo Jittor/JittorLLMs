@@ -52,6 +52,7 @@ class LLaMA:
             )
             tokens[:, cur_pos] = next_token
             prev_pos = cur_pos
+            jt.sync_all()
 
         decoded = []
         for i, t in enumerate(tokens.tolist()):
