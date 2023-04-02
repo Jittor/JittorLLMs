@@ -12,6 +12,12 @@ Jittor大模型库架构图如下所示。
 
 ## 部署方法
 
+可以通过下述指令安装。（注意如果使用 `ChatGLM` 的话，一定要使用 `jittor` 提供的镜像源，这里会引入一个空的 `torch` 包来摆脱 `icetk` 对 `torch` 的依赖。）
+
+```
+pip install -r requirements.txt -i https://pypi.jittor.org/simple
+```
+
 部署只需一行命令即可：
 
 ```
@@ -20,12 +26,19 @@ python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 
 下图是 `chatglm` 的实时对话截图：
 
+![](./imgs/ChatGLM.gif)
+
 下图是 `盘古alpha` 的实时对话截图：
+
+![](./imgs/PanGuAlpha.gif)
 
 下图是 `chatrwkv` 的实时对话截图：
 
+![](./imgs/ChatRWKV.gif)
 
-还将提供web demo和api demo。
+目前支持了 `ChatGLM` 和 盘古α 的中文对话，`ChatRWKV` 支持英文对话，后续会持续更新最新的模型参数以及微调的结果。
+
+之后还将提供web demo和api demo。
 
 ## 配置要求低
 
