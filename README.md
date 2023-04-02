@@ -16,8 +16,8 @@ Jittor大模型库架构图如下所示。
 
 ```
 # 国内使用 gitlink clone
-git clone https://gitlink.org.cn/jittor/JittorLLMs.git --shallow
-# github: git clone https://github.com/Jittor/JittorLLMs.git --shallow
+git clone https://gitlink.org.cn/jittor/JittorLLMs.git --depth 1
+# github: git clone https://github.com/Jittor/JittorLLMs.git --depth 1
 pip install -r requirements.txt -i https://pypi.jittor.org/simple
 ```
 
