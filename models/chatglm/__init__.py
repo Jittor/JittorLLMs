@@ -1,6 +1,7 @@
 import os, platform
 from transformers import AutoTokenizer, AutoModel
 from models import LLMModel
+import jittor as jt
 
 os_name = platform.system()
 clear_command = 'cls' if os_name == 'Windows' else 'clear'
@@ -17,7 +18,11 @@ class ChatGLMMdoel(LLMModel):
     def __init__(self, args) -> None:
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(os.path.dirname(__file__), trust_remote_code=True)
-        self.model = AutoModel.from_pretrained(os.path.dirname(__file__), trust_remote_code=True).half().cuda()
+        self.model = AutoModel.from_pretrained(os.path.dirname(__file__), trust_remote_code=True)
+        if jt.has_cuda:
+            self.model.half().cuda()
+        else:
+            self.model.float32()
         self.model.eval()
         #self.model = self.model.eval()
 

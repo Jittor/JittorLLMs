@@ -1,4 +1,4 @@
-jittor == 1.3.7.1
-jtorch == 0.1.0
+jittor >= 1.3.7.2
+jtorch >= 0.1.2
 torch
 torchvision
