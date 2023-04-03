@@ -15,7 +15,12 @@ Jittor大模型库架构图如下所示。
 可以通过下述指令安装依赖。（注意如果使用 `ChatGLM` 的话，一定要使用 `jittor` 提供的镜像源，这里会引入一个空的 `torch` 包来摆脱 `icetk` 对 `torch` 的依赖。）
 
 ```
-pip install -r requirements.txt -i https://pypi.jittor.org/simple
+# 国内使用 gitlink clone
+git clone https://gitlink.org.cn/jittor/JittorLLMs.git --depth 1
+# github: git clone https://github.com/Jittor/JittorLLMs.git --depth 1
+cd JittorLLMs
+# -i 指定用jittor的源， -I 强制重装Jittor版torch
+pip install -r requirements.txt -i https://pypi.jittor.org/simple -I
 ```
 
 部署只需一行命令即可：
@@ -30,19 +35,19 @@ python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 下图是 [ChatGLM](https://github.com/THUDM/ChatGLM-6B) 的实时对话截图：
 
 <center>
-<img src="./imgs/ChatGLM.gif"  width="350">
+<img src="./imgs/ChatGLM2.gif"  width="350">
 </center>
 
 下图是 [盘古Alpha](https://openi.org.cn/pangu/) 的实时对话截图：
 
 <center>
-<img src="./imgs/PanGuAlpha.gif"  width="350">
+<img src="./imgs/PanGuAlpha2.gif"  width="350">
 </center>
 
 下图是 [ChatRWKV](https://github.com/BlinkDL/ChatRWKV) 的实时对话截图：
 
 <center>
-<img src="./imgs/ChatRWKV.gif"  width="350">
+<img src="./imgs/ChatRWKV2.gif"  width="350">
 </center>
 
 下图是 [LLaMA](https://github.com/facebookresearch/llama) 的实时对话截图：
@@ -98,6 +103,16 @@ pip install torch -i https://pypi.jittor.org/simple
 * Jittor开发者交流群：761222083
 
 <img src="./imgs/qq.png"  width="250" height="300">
+
+# 后续计划
+
+* 移植 MOSS 大模型
+* 动态 swap 性能优化
+* CPU 性能优化
+* 添加更多国内外优秀大模型支持
+* ......
+
+欢迎各位向我们提出宝贵的意见，可加入计图开发者交流群实时交流。
 
 ## 关于我们
 
