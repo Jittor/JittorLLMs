@@ -1,6 +1,7 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 # This software may be used and distributed according to the terms of the GNU General Public License version 3.
 
+import os
 from typing import List
 
 import jittor as jt
@@ -54,17 +55,21 @@ class LLaMA:
             prev_pos = cur_pos
             jt.sync_all()
 
-        decoded = []
-        for i, t in enumerate(tokens.tolist()):
-            # cut to max gen len
-            t = t[: len(prompt_tokens[i]) + max_gen_len]
-            # cut to eos tok if any
-            try:
-                t = t[: t.index(self.tokenizer.eos_id)]
-            except ValueError:
-                pass
-            decoded.append(self.tokenizer.decode(t))
-        return decoded
+            if cur_pos <= start_pos+1:
+                continue
+            for i, t in enumerate(tokens.tolist()):
+                # cut to max gen len
+                t = t[: cur_pos]
+
+                if cur_pos >= len(prompt_tokens[i]) + max_gen_len:
+                    return
+                # cut to eos tok if any
+                try:
+                    t = t[: t.index(self.tokenizer.eos_id)]
+                except ValueError:
+                    pass
+                new_decode = self.tokenizer.decode(t)
+                yield new_decode
 
 
 def sample_top_p(probs, p):

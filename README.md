@@ -45,7 +45,13 @@ python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 <img src="./imgs/ChatRWKV.gif"  width="350">
 </center>
 
-目前支持了 `ChatGLM` 和 盘古α 的中文对话，`ChatRWKV` 支持英文对话，后续会持续更新最新的模型参数以及微调的结果。
+下图是 [LLaMA](https://github.com/facebookresearch/llama) 的实时对话截图：
+
+<center>
+<img src="./imgs/LLaMA.gif"  width="350">
+</center>
+
+目前支持了 `ChatGLM` 和 盘古α 的中文对话，`ChatRWKV` 和 `LLaMA` 支持英文对话，后续会持续更新最新的模型参数以及微调的结果。
 
 之后还将提供 web demo 和 api demo。
 
