@@ -6,6 +6,7 @@ import platform
 
 import jittor as jt
 jt.flags.use_cuda = 1
+jt.flags.amp_level = 3
 
 from models import LLMModel
 from llama import ModelArgs, Transformer, Tokenizer, LLaMA
