@@ -2,12 +2,17 @@ import time
 import json
 from pathlib import Path
 import os
+import platform
 
 import jittor as jt
 jt.flags.use_cuda = 1
+jt.flags.amp_level = 3
 
 from models import LLMModel
 from llama import ModelArgs, Transformer, Tokenizer, LLaMA
+
+os_name = platform.system()
+clear_command = 'cls' if os_name == 'Windows' else 'clear'
 
 
 def load(
@@ -57,12 +62,18 @@ class LLaMAModel(LLMModel):
         return output[0]
 
     def chat(self):
+        os.system(clear_command)
+        history = ""
         while True:
+            session = "用户输入: "
             input_text = input("用户输入: ")
-            input_text = input_text
-            output = self.run(input_text)
-            print("LLaMA: ", output)
-
+            session += input_text + "\n"
+            session += "LLaMA   : "
+            with jt.no_grad():
+                for output_text in self.generator.generate([input_text], max_gen_len=256, temperature=0.8, top_p=0.95):
+                    os.system(clear_command)
+                    print(history + session + output_text, flush=True)
+            history += session + output_text + "\n"
 
 def get_model(args):
     args.ckpt_dir = os.path.join(jt.compiler.ck_path, "llama")

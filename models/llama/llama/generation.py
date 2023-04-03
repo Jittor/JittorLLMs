@@ -1,12 +1,18 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 # This software may be used and distributed according to the terms of the GNU General Public License version 3.
 
+import os
 from typing import List
 
 import jittor as jt
 
 from llama.tokenizer import Tokenizer
 from llama.model import Transformer
+
+spell = '''A dialog, where User interacts with AI. AI is helpful, kind, obedient, honest, and knows its own limits. AI replies the User in one line.
+User: Hello, AI.
+AI: Hello! How can I assist you today?
+User: '''
 
 
 class LLaMA:
@@ -21,6 +27,8 @@ class LLaMA:
         temperature: float = 0.8,
         top_p: float = 0.95,
     ) -> List[str]:
+        prompts = [spell + prompt + '\n' for prompt in prompts]
+
         bsz = len(prompts)
         params = self.model.params
         assert bsz <= params.max_batch_size, (bsz, params.max_batch_size)
@@ -54,17 +62,25 @@ class LLaMA:
             prev_pos = cur_pos
             jt.sync_all()
 
-        decoded = []
-        for i, t in enumerate(tokens.tolist()):
-            # cut to max gen len
-            t = t[: len(prompt_tokens[i]) + max_gen_len]
-            # cut to eos tok if any
-            try:
-                t = t[: t.index(self.tokenizer.eos_id)]
-            except ValueError:
-                pass
-            decoded.append(self.tokenizer.decode(t))
-        return decoded
+            if cur_pos <= start_pos:
+                continue
+            for i, t in enumerate(tokens.tolist()):
+                # cut to max gen len
+                t = t[start_pos: cur_pos]
+
+                if cur_pos >= len(prompt_tokens[i]) + max_gen_len:
+                    return
+                # cut to eos tok if any
+                try:
+                    t = t[start_pos: t.index(self.tokenizer.eos_id)]
+                except ValueError:
+                    pass
+                new_decode = self.tokenizer.decode(t)
+                if new_decode.startswith("AI: "):
+                    new_decode = new_decode[4:]
+                if '\n' in new_decode:
+                    return new_decode
+                yield new_decode
 
 
 def sample_top_p(probs, p):
