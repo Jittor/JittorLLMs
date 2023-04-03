@@ -2,6 +2,7 @@ import os, platform
 from transformers import AutoTokenizer, AutoModel
 from models import LLMModel
 import jittor as jt
+import torch
 
 os_name = platform.system()
 clear_command = 'cls' if os_name == 'Windows' else 'clear'
@@ -23,6 +24,8 @@ class ChatGLMMdoel(LLMModel):
             self.model.half().cuda()
         else:
             self.model.float32()
+            torch.half = torch.float
+            torch.Tensor.half = torch.Tensor.float
         self.model.eval()
         #self.model = self.model.eval()
 
