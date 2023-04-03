@@ -19,7 +19,6 @@ class ChatGLMMdoel(LLMModel):
         self.tokenizer = AutoTokenizer.from_pretrained(os.path.dirname(__file__), trust_remote_code=True)
         self.model = AutoModel.from_pretrained(os.path.dirname(__file__), trust_remote_code=True).half().cuda()
         self.model.eval()
-        #self.model = self.model.eval()
 
     def chat(self) -> str:
         global stop_stream
@@ -34,7 +33,11 @@ class ChatGLMMdoel(LLMModel):
     
     def run_web_demo(self, input_text, history=[]):
         while True:
+            os.system(clear_command)
             yield self.run(input_text, history=history)
+
+    def run(self, text, history=[]):
+        return self.model.chat(self.tokenizer, text, history=history)
 
 def get_model(args):
     return ChatGLMMdoel(args)
