@@ -68,13 +68,17 @@ python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 
 同时，根据我们调研，Jittor大模型推理库也是目前对配置门槛要求最低的框架，只需要参数磁盘空间和2G内存，无需显卡，也可以部署大模型，下面是在不同硬件配置条件下的资源消耗与速度对比。可以发现，JittorLLMs在显存充足的情况下，性能优于同类框架，而显存不足甚至没有显卡，JittorLLMs都能以一定速度运行。
 
-节省内存方法，请安装Jittor版本大于1.3.7.0，并添加如下环境变量：
+节省内存方法，请安装Jittor版本大于1.3.7.5，并添加如下环境变量：
 ```bash
 export JT_SAVE_MEM=1
 # 限制cpu最多使用16G
 export cpu_mem_limit=16000000000
 # 限制device内存（如gpu、tpu等）最多使用8G
 export device_mem_limit=8000000000
+# windows 用户，请使用powershell
+# $env:JT_SAVE_MEM="1"
+# $env:cpu_mem_limit="16000000000"
+# $env:device_mem_limit="8000000000"
 ```
 用户可以自由设定cpu和设备内存的使用量，如果不希望对内存进行限制，可以设置为`-1`。
 ```bash
@@ -82,6 +86,10 @@ export device_mem_limit=8000000000
 export cpu_mem_limit=-1
 # 限制device内存（如gpu、tpu等）最多使用8G
 export device_mem_limit=-1
+# windows 用户，请使用powershell
+# $env:JT_SAVE_MEM="1"
+# $env:cpu_mem_limit="-1"
+# $env:device_mem_limit="-1"
 ```
 
 ## 速度更快
