@@ -66,4 +66,4 @@ def get_pangualpha():
                  "latest_checkpointed_iteration.txt"), "w")
         f.write(str(1000)+"\n")
         f.close()
-        os.system(f"cd {model_dir} && ln -s {path}")
+        os.symlink(path, os.path.join(model_dir, "model_optim_rng.pth"))
