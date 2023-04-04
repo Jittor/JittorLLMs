@@ -92,6 +92,11 @@ export device_mem_limit=-1
 # $env:device_mem_limit="-1"
 ```
 
+如果想要清理磁盘交换文件，可以运行如下命令
+```bash
+python3 -m jittor_utils.clean_cache swap
+```
+
 ## 速度更快
 
 大模型在推理过程中，常常碰到参数文件过大，模型加载效率低下等问题。Jittor框架通过内存直通读取，减少内存拷贝数量，大大提升模型加载效率。相比PyTorch框架，Jittor框架的模型加载效率提升了40%。
