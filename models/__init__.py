@@ -42,6 +42,6 @@ def get_model(args) -> LLMModel:
         return module.get_model(args)
     except ModuleNotFoundError:
         traceback.print_exc()
-        print(f"Import Error, maybe the dependencies are not installed, please try 'python3 -m pip install -r models/{model_name}/requirements.txt'")
-        print(f"导入错误，可能没有安装此模型需要的依赖，请尝试运行 'python3 -m pip install -r models/{model_name}/requirements.txt'")
+        print(f"Import Error, maybe the dependencies are not installed, please try 'python3 -m pip install -r models/{model_name}/requirements.txt -i https://pypi.jittor.org/simple'")
+        print(f"导入错误，可能没有安装此模型需要的依赖，请尝试运行 'python3 -m pip install -r models/{model_name}/requirements.txt -i https://pypi.jittor.org/simple'")
         exit()
