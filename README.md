@@ -123,6 +123,13 @@ pip install torch -i https://pypi.jittor.org/simple
 * 添加更多国内外优秀大模型支持
 * ......
 
+## 模型支持TODO list
+
+* MOSS
+* [BELLE](https://github.com/LianjiaTech/BELLE)
+
+欢迎各位向我们提交请求
+
 欢迎各位向我们提出宝贵的意见，可加入计图开发者交流群实时交流。
 
 ## 关于我们
