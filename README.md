@@ -38,7 +38,7 @@ pip install -r requirements.txt -i https://pypi.jittor.org/simple -I
 部署只需一行命令即可：
 
 ```
-python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
+python cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 ```
 
 运行后会自动从服务器上下载模型文件到本地，会占用根目录下一定的硬盘空间。
@@ -129,7 +129,7 @@ export device_mem_limit=-1
 
 如果想要清理磁盘交换文件，可以运行如下命令
 ```bash
-python3 -m jittor_utils.clean_cache swap
+python -m jittor_utils.clean_cache swap
 ```
 
 ## 速度更快
