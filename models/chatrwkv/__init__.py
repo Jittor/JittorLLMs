@@ -145,7 +145,7 @@ The following is a verbose and detailed conversation between an AI assistant cal
             self.save_all_stat(s, 'chat', out)
 
         # print(f'{self.tokenizer.decode(self.model_tokens)}'.replace(f'\n\n{bot}',f'\n{bot}'), end='')
-
+        self.history = []
 
     def run_rnn(self, tokens, newline_adj = 0):
         tokens = [int(x) for x in tokens]
@@ -176,7 +176,7 @@ The following is a verbose and detailed conversation between an AI assistant cal
         return self.all_state[n]['out']
 
 
-    def run(self, message: str) -> str:
+    def run(self, message: str, is_web=False) -> str:
         srv = 'dummy_server'
 
         msg = message.replace('\\n','\n').strip()
@@ -286,7 +286,7 @@ The following is a verbose and detailed conversation between an AI assistant cal
 
             begin = len(self.model_tokens)
             out_last = begin
-
+            text_out = ""
             for i in range(999):
                 if i <= 0:
                     newline_adj = -999999999
@@ -307,7 +307,9 @@ The following is a verbose and detailed conversation between an AI assistant cal
 
                 xxx = self.tokenizer.decode(self.model_tokens[out_last:])
                 if '\ufffd' not in xxx: # avoid utf-8 display issues
-                    print(xxx, end='', flush=True)
+                    text_out += xxx.replace("\n", "")
+                    if not is_web:
+                        print(xxx, end='', flush=True)
                     out_last = begin + i + 1
                 send_msg = self.tokenizer.decode(self.model_tokens[begin:])
                 if '\n\n' in send_msg:
@@ -315,6 +317,7 @@ The following is a verbose and detailed conversation between an AI assistant cal
                     break
 
             self.save_all_stat(srv, 'chat', out)
+        return text_out
 
     def chat(self):
         while True:
@@ -322,6 +325,11 @@ The following is a verbose and detailed conversation between an AI assistant cal
             print("ChatRWKV: ", end="")
             self.run(text)
 
+    def run_web_demo(self, input_text, history=[]):
+        self.history = []
+        response = self.run(input_text, is_web=True)
+        history.append([input_text, response])
+        yield response, history
 
 def get_model(args):
     return ChatRWKVModel(os.path.join(jt.compiler.ck_path, "ChatRWKV", "RWKV-4-Pile-3B-EngChn-test4-20230115-fp32.pth"),

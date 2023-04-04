@@ -59,10 +59,12 @@ class LLaMAModel(LLMModel):
     def run(self, input_text: str) -> str:
         with jt.no_grad():
             output = self.generator.generate([input_text], max_gen_len=256, temperature=0.8, top_p=0.95)
-        return output[0]
+        text_out = ""
+        for output_text in output:
+            text_out = output_text
+        return text_out
 
     def chat(self):
-        os.system(clear_command)
         history = ""
         while True:
             session = "用户输入: "
@@ -71,9 +73,13 @@ class LLaMAModel(LLMModel):
             session += "LLaMA   : "
             with jt.no_grad():
                 for output_text in self.generator.generate([input_text], max_gen_len=256, temperature=0.8, top_p=0.95):
-                    os.system(clear_command)
                     print(history + session + output_text, flush=True)
             history += session + output_text + "\n"
+    
+    def run_web_demo(self, input_text, history=[]):
+        response = self.run(input_text)
+        history.append([input_text, response])
+        yield response, history
 
 def get_model(args):
     args.ckpt_dir = os.path.join(jt.compiler.ck_path, "llama")

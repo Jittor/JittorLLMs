@@ -10,6 +10,16 @@ Jittor大模型库架构图如下所示。
 
 ![](./imgs/arch.png)
 
+## 配置要求
+
+* 内存要求：至少2G，推荐32G
+* 显存：可选， 推荐16G
+* 操作系统：支持Windows，Mac，Linux全平台。
+* 磁盘空间：至少40GB空闲磁盘空间，用于下载参数和存储交换文件。
+
+磁盘空间不够时，可以通过环境变量`JITTOR_HOME`指定缓存存放路径。
+内存或者显存不够，出现进程被杀死的情况，请参考下方，限制内存消耗的方法。
+
 ## 部署方法
 
 可以通过下述指令安装依赖。（注意：此脚本会安装Jittor版torch，推荐用户新建环境运行）
@@ -60,7 +70,32 @@ python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 
 目前支持了 `ChatGLM` 和 盘古α 的中文对话，`ChatRWKV` 和 `LLaMA` 支持英文对话，后续会持续更新最新的模型参数以及微调的结果。
 
-之后还将提供 web demo 和 api demo。
+### WebDemo
+
+JittorLLM通过gradio库，允许用户在浏览器之中和大模型直接进行对话。
+
+~~~bash
+python web_demo.py chatglm
+~~~
+
+可以得到下图所示的结果。
+
+![Web_demo](docs/web_demo.png)
+
+### 后端服务部署
+
+JittorLLM在api.py文件之中，提供了一个架设后端服务的示例。
+
+~~~bash
+python api.py chatglm
+~~~
+
+接着可以使用如下代码进行直接访问
+
+~~~python
+post_data = json.dumps({'prompt': 'Hello, solve 5x=13'})
+print(json.loads(requests.post("http://0.0.0.0:8000", post_data).text)['response'])
+~~~
 
 ## 配置要求低
 

@@ -64,6 +64,7 @@ def generate(model, context_tokens, args, tokenizer, max_num=50, begin=0):
     type_ids = None
     bs,_  = tokens.shape
     cnt = 0
+    text_out = ""
     while valid_length < args.seq_length:
         with torch.no_grad():
             logits = model(tokens,
@@ -87,13 +88,14 @@ def generate(model, context_tokens, args, tokenizer, max_num=50, begin=0):
         if p_args[target_index] == tokenizer.eod or \
                 valid_length == args.seq_length-1 or cnt>=max_num:
             outputs = tokens.cpu().numpy()
-            return
+            return text_out
 
         if (begin > 0) and (valid_length >= begin):
             #print(p_args[target_index])
             character = tokenizer.convert_ids_to_tokens([int(p_args[target_index])])
             if character == '问' or character == '答':
-                return
+                return text_out
+            text_out += character
             print(character, end='')
             sys.stdout.flush()
 
@@ -103,7 +105,7 @@ def generate(model, context_tokens, args, tokenizer, max_num=50, begin=0):
 
     length = np.sum(outputs != tokenizer.pad_id)
     outputs = outputs[0][:length]
-    return outputs
+    return text_out
 
 
 class PanGuAlphaModel(LLMModel):
@@ -151,6 +153,21 @@ class PanGuAlphaModel(LLMModel):
             generate(self.model, context_tokens, self.args, tokenizer, 100, len(text))
             print("")
 
+    def run(self, text, tokenizer=None, history=[]):
+        if tokenizer is None:
+            tokenizer = get_tokenizer()
+            tokenizer.tokenize("init")
+        text = "问：" + text + "？答："
+        context_tokens = tokenizer.tokenize(text)
+        return generate(self.model, context_tokens, self.args, tokenizer, 100, len(text))
+
+    def run_web_demo(self, input_text, history=[]):
+        self.history = []
+        tokenizer = get_tokenizer()
+        tokenizer.tokenize("init")
+        response = self.run(input_text, tokenizer)
+        self.history.append([input_text, response])
+        yield response, self.history
 
 def get_model(args):
     return PanGuAlphaModel()

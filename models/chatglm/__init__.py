@@ -27,7 +27,6 @@ class ChatGLMMdoel(LLMModel):
             torch.half = torch.float
             torch.Tensor.half = torch.Tensor.float
         self.model.eval()
-        #self.model = self.model.eval()
 
     def chat(self) -> str:
         global stop_stream
@@ -41,6 +40,9 @@ class ChatGLMMdoel(LLMModel):
     def run_web_demo(self, input_text, history=[]):
         while True:
             yield self.run(input_text, history=history)
+
+    def run(self, text, history=[]):
+        return self.model.chat(self.tokenizer, text, history=history)
 
 def get_model(args):
     return ChatGLMMdoel(args)
