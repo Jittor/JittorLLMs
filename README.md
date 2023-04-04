@@ -80,7 +80,7 @@ python web_demo.py chatglm
 
 可以得到下图所示的结果。
 
-![Web_demo](docs/web_demo.png)
+![Web_demo](imgs/web_demo.png)
 
 ### 后端服务部署
 
