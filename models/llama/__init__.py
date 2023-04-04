@@ -61,8 +61,7 @@ class LLaMAModel(LLMModel):
             output = self.generator.generate([input_text], max_gen_len=256, temperature=0.8, top_p=0.95)
         text_out = ""
         for output_text in output:
-            os.system(clear_command)
-            text_out += output_text
+            text_out = output_text
         return text_out
 
     def chat(self):
@@ -80,10 +79,9 @@ class LLaMAModel(LLMModel):
             history += session + output_text + "\n"
     
     def run_web_demo(self, input_text, history=[]):
-        self.history = []
         response = self.run(input_text)
-        self.history.append([input_text, response])
-        yield response, self.history
+        history.append([input_text, response])
+        yield response, history
 
 def get_model(args):
     args.ckpt_dir = os.path.join(jt.compiler.ck_path, "llama")
