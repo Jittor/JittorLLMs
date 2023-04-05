@@ -1,6 +1,8 @@
 import os, platform
 from transformers import AutoTokenizer, AutoModel
 from models import LLMModel
+import jittor as jt
+import torch
 
 os_name = platform.system()
 clear_command = 'cls' if os_name == 'Windows' else 'clear'
@@ -17,7 +19,13 @@ class ChatGLMMdoel(LLMModel):
     def __init__(self, args) -> None:
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(os.path.dirname(__file__), trust_remote_code=True)
-        self.model = AutoModel.from_pretrained(os.path.dirname(__file__), trust_remote_code=True).half().cuda()
+        self.model = AutoModel.from_pretrained(os.path.dirname(__file__), trust_remote_code=True)
+        if jt.has_cuda:
+            self.model.half().cuda()
+        else:
+            self.model.float32()
+            torch.half = torch.float
+            torch.Tensor.half = torch.Tensor.float
         self.model.eval()
         #self.model = self.model.eval()
 
@@ -27,10 +35,8 @@ class ChatGLMMdoel(LLMModel):
         while True:
             text = input("用户输入:")
             for response, history in self.model.stream_chat(self.tokenizer, text, history=history):
-                os.system(clear_command)
-                print(build_prompt(history), flush=True)
-            os.system(clear_command)
-            print(build_prompt(history), flush=True)
+                print(response, end='\r')
+            print(flush=True)
     
     def run_web_demo(self, input_text, history=[]):
         while True:

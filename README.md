@@ -1,4 +1,4 @@
-# 计图大模型推理库 - 没有显卡笔记本也能跑大模型
+# 计图大模型推理库 - 笔记本没有显卡也能跑大模型
 本大模型推理库JittorLLMs有以下几个特点：
 
 1.  成本低：相比同类框架，本库可大幅降低硬件配置要求（减少80%），没有显卡，2G内存就能跑大模型，人人皆可在普通机器上，实现大模型本地部署；是目前已知的部署成本最低的大模型库；
@@ -12,11 +12,18 @@ Jittor大模型库架构图如下所示。
 
 ## 部署方法
 
-可以通过下述指令安装依赖。（注意如果使用 `ChatGLM` 的话，一定要使用 `jittor` 提供的镜像源，这里会引入一个空的 `torch` 包来摆脱 `icetk` 对 `torch` 的依赖。）
+可以通过下述指令安装依赖。（注意：此脚本会安装Jittor版torch，推荐用户新建环境运行）
 
 ```
-pip install -r requirements.txt -i https://pypi.jittor.org/simple
+# 国内使用 gitlink clone
+git clone https://gitlink.org.cn/jittor/JittorLLMs.git --depth 1
+# github: git clone https://github.com/Jittor/JittorLLMs.git --depth 1
+cd JittorLLMs
+# -i 指定用jittor的源， -I 强制重装Jittor版torch
+pip install -r requirements.txt -i https://pypi.jittor.org/simple -I
 ```
+
+如果出现找不到jittor版本的错误，可能是您使用的镜像还没有更新，使用如下命令更新最新版：`pip install jittor -U -i https://pypi.org/simple`
 
 部署只需一行命令即可：
 
@@ -30,22 +37,28 @@ python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 下图是 [ChatGLM](https://github.com/THUDM/ChatGLM-6B) 的实时对话截图：
 
 <center>
-<img src="./imgs/ChatGLM.gif"  width="350">
+<img src="./imgs/ChatGLM2.gif"  width="350">
 </center>
 
 下图是 [盘古Alpha](https://openi.org.cn/pangu/) 的实时对话截图：
 
 <center>
-<img src="./imgs/PanGuAlpha.gif"  width="350">
+<img src="./imgs/PanGuAlpha2.gif"  width="350">
 </center>
 
 下图是 [ChatRWKV](https://github.com/BlinkDL/ChatRWKV) 的实时对话截图：
 
 <center>
-<img src="./imgs/ChatRWKV.gif"  width="350">
+<img src="./imgs/ChatRWKV2.gif"  width="350">
 </center>
 
-目前支持了 `ChatGLM` 和 盘古α 的中文对话，`ChatRWKV` 支持英文对话，后续会持续更新最新的模型参数以及微调的结果。
+下图是 [LLaMA](https://github.com/facebookresearch/llama) 的实时对话截图：
+
+<center>
+<img src="./imgs/LLaMA.gif"  width="350">
+</center>
+
+目前支持了 `ChatGLM` 和 盘古α 的中文对话，`ChatRWKV` 和 `LLaMA` 支持英文对话，后续会持续更新最新的模型参数以及微调的结果。
 
 之后还将提供 web demo 和 api demo。
 
@@ -55,13 +68,17 @@ python3 cli_demo.py [chatglm|pangualpha|llama|chatrwkv]
 
 同时，根据我们调研，Jittor大模型推理库也是目前对配置门槛要求最低的框架，只需要参数磁盘空间和2G内存，无需显卡，也可以部署大模型，下面是在不同硬件配置条件下的资源消耗与速度对比。可以发现，JittorLLMs在显存充足的情况下，性能优于同类框架，而显存不足甚至没有显卡，JittorLLMs都能以一定速度运行。
 
-节省内存方法，请安装Jittor版本大于1.3.7.0，并添加如下环境变量：
+节省内存方法，请安装Jittor版本大于1.3.7.8，并添加如下环境变量：
 ```bash
-export JIT_SAVE_MEM=1
+export JT_SAVE_MEM=1
 # 限制cpu最多使用16G
 export cpu_mem_limit=16000000000
 # 限制device内存（如gpu、tpu等）最多使用8G
 export device_mem_limit=8000000000
+# windows 用户，请使用powershell
+# $env:JT_SAVE_MEM="1"
+# $env:cpu_mem_limit="16000000000"
+# $env:device_mem_limit="8000000000"
 ```
 用户可以自由设定cpu和设备内存的使用量，如果不希望对内存进行限制，可以设置为`-1`。
 ```bash
@@ -69,6 +86,15 @@ export device_mem_limit=8000000000
 export cpu_mem_limit=-1
 # 限制device内存（如gpu、tpu等）最多使用8G
 export device_mem_limit=-1
+# windows 用户，请使用powershell
+# $env:JT_SAVE_MEM="1"
+# $env:cpu_mem_limit="-1"
+# $env:device_mem_limit="-1"
+```
+
+如果想要清理磁盘交换文件，可以运行如下命令
+```bash
+python3 -m jittor_utils.clean_cache swap
 ```
 
 ## 速度更快
@@ -92,6 +118,24 @@ pip install torch -i https://pypi.jittor.org/simple
 * Jittor开发者交流群：761222083
 
 <img src="./imgs/qq.png"  width="250" height="300">
+
+## 后续计划
+
+* 模型训练与微调
+* 移植 MOSS 大模型
+* 动态 swap 性能优化
+* CPU 性能优化
+* 添加更多国内外优秀大模型支持
+* ......
+
+## 模型支持TODO list
+
+* MOSS
+* [BELLE](https://github.com/LianjiaTech/BELLE)
+
+欢迎各位向我们提交请求
+
+欢迎各位向我们提出宝贵的意见，可加入计图开发者交流群实时交流。
 
 ## 关于我们
 

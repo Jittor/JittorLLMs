@@ -51,7 +51,7 @@ def get_chatglm():
         new_path.append(download_fromhub(f"jittorhub://{f}", tdir="chat-glm"))
         ln_dir = os.path.join(model_dir, "chatglm")
         if not os.path.exists(os.path.join(ln_dir, f)):
-            os.system(f"cd {ln_dir} && ln -s {new_path[-1]} ")
+            os.symlink(new_path[-1], os.path.join(ln_dir, f))
     return new_path
 
 
