@@ -38,6 +38,10 @@ def get_model(args) -> LLMModel:
     globals()[f"get_{model_name}"]()
 
     try:
+        if model_name == "chatglm":
+            import transformers
+            if transformers.__version__ != '4.26.1':
+                raise RuntimeError(f"transformers 版本不匹配 {transformers.__version__} != 4.26.1, 请运行 'python3 -m pip install -r models/{model_name}/requirements.txt -i https://pypi.jittor.org/simple' ")
         module = importlib.import_module(f"models.{model_name}")
         return module.get_model(args)
     except ModuleNotFoundError:
