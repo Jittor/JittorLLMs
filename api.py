@@ -23,6 +23,7 @@ model: models.LLMModel
 
 class ChatRequest(BaseModel):
     prompt: str
+    history: t.Optional[list] = []
 
 
 class ChatResponse(BaseModel):
@@ -35,7 +36,7 @@ class ChatResponse(BaseModel):
 @app.post("/", response_model=ChatResponse)
 async def chat_completions(request: ChatRequest) -> ChatResponse:
     prompt = request.prompt
-    output = model.run(prompt)
+    output = model.run(prompt, request.history)
     if isinstance(output, tuple):
         response, history = output
     else:
