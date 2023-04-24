@@ -1,10 +1,11 @@
 import argparse
 import datetime
-import json
 import logging
+import typing as t
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
+from pydantic import BaseModel
 
 import models
 
@@ -13,37 +14,35 @@ logger = logging.getLogger(__name__)
 DEVICE = "cuda"
 DEVICE_ID = "0"
 CUDA_DEVICE = f"{DEVICE}:{DEVICE_ID}" if DEVICE_ID else DEVICE
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 app = FastAPI()
 
+model: models.LLMModel
 
-@app.post("/")
-async def create_item(request: Request):
-    global model
-    json_post_raw = await request.json()
-    json_post = json.dumps(json_post_raw)
-    json_post_list = json.loads(json_post)
-    prompt = json_post_list.get('prompt')
-    # history = json_post_list.get('history')
-    # max_length = json_post_list.get('max_length')
-    # top_p = json_post_list.get('top_p')
-    # temperature = json_post_list.get('temperature')
+
+class ChatRequest(BaseModel):
+    prompt: str
+
+
+class ChatResponse(BaseModel):
+    status: t.Optional[int] = 200
+    response: str
+    history: t.Optional[list] = []
+    time: str
+
+
+@app.post("/", response_model=ChatResponse)
+async def chat_completions(request: ChatRequest) -> ChatResponse:
+    prompt = request.prompt
     output = model.run(prompt)
     if isinstance(output, tuple):
         response, history = output
     else:
         response = output
         history = []
-    now = datetime.datetime.now()
-    time = now.strftime("%Y-%m-%d %H:%M:%S")
-    answer = {
-        "response": response,
-        "history": history,
-        "status": 200,
-        "time": time
-    }
     logger.info(f"prompt: {prompt}, response: {response}")
-    return answer
+    return ChatResponse(response=response, history=history, time=datetime.datetime.now().strftime(DATETIME_FORMAT))
 
 
 if __name__ == '__main__':
@@ -53,4 +52,6 @@ if __name__ == '__main__':
     parser.add_argument("model", choices=models.availabel_models)
     args = parser.parse_args()
     model = models.get_model(args)
+    logger.info(f"model<{args}> load success")
+
     uvicorn.run(app, host='0.0.0.0', port=8000, workers=1)
