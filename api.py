@@ -1,14 +1,21 @@
-from fastapi import FastAPI, Request
 import argparse
+import datetime
+import json
+import logging
+
+import uvicorn
+from fastapi import FastAPI, Request
+
 import models
-import uvicorn, json, datetime
-import torch
+
+logger = logging.getLogger(__name__)
 
 DEVICE = "cuda"
 DEVICE_ID = "0"
 CUDA_DEVICE = f"{DEVICE}:{DEVICE_ID}" if DEVICE_ID else DEVICE
 
 app = FastAPI()
+
 
 @app.post("/")
 async def create_item(request: Request):
@@ -35,12 +42,13 @@ async def create_item(request: Request):
         "status": 200,
         "time": time
     }
-    log = "[" + time + "] " + '", prompt:"' + prompt + '", response:"' + repr(response) + '"'
-    print(log)
+    logger.info(f"prompt: {prompt}, response: {response}")
     return answer
 
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("model", choices=models.availabel_models)
     args = parser.parse_args()
