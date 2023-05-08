@@ -43,6 +43,7 @@ async def create_item(request: Request):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("model", choices=models.availabel_models)
+    parser.add_argument("--port", default=8000, type=int)
     args = parser.parse_args()
     model = models.get_model(args)
-    uvicorn.run(app, host='0.0.0.0', port=8000, workers=1)
+    uvicorn.run(app, host='0.0.0.0', port=args.port, workers=1)
