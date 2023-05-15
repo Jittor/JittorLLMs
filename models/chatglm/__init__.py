@@ -33,8 +33,10 @@ class ChatGLMMdoel(LLMModel):
         history = []
         while True:
             text = input("用户输入:")
+            last_response = ""
             for response, history in self.model.stream_chat(self.tokenizer, text, history=history):
-                print(response, end='\r')
+                print(response[len(last_response):], end='')
+                last_response = response
             print(flush=True)
     
     def run_web_demo(self, input_text, history=[]):
