@@ -16,7 +16,7 @@ def predict(input, history=None):
             updates.append(gr.update(visible=True, value=f"{args.model}：" + response))
         if len(updates) < MAX_BOXES:
             updates = updates + [gr.Textbox.update(visible=False)] * (MAX_BOXES - len(updates))
-        yield [history] + updates
+        yield [history] + updates + [""]
 
 
 if __name__ == "__main__":
@@ -43,6 +43,6 @@ if __name__ == "__main__":
                 top_p = gr.Slider(0, 1, value=0.7, step=0.01, label="Top P", interactive=True)
                 temperature = gr.Slider(0, 1, value=0.95, step=0.01, label="Temperature", interactive=True)
                 button = gr.Button("Generate")
-        button.click(predict, [txt, state], [state] + text_boxes)
-        txt.submit(predict, [txt, state], [state] + text_boxes)
+        button.click(predict, [txt, state], [state] + text_boxes + [txt])
+        txt.submit(predict, [txt, state], [state] + text_boxes + [txt])
     demo.queue().launch(share=False, inbrowser=False, server_port=51234, server_name="0.0.0.0")
