@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import os
 import platform
+import typing as t
 
 import jittor as jt
 jt.flags.use_cuda = 1
@@ -56,7 +57,7 @@ class LLaMAModel(LLMModel):
         )
         jt.gc()
 
-    def run(self, input_text: str) -> str:
+    def run(self, input_text: str, history: t.Optional[list] = None, **kwargs) -> str:
         with jt.no_grad():
             output = self.generator.generate([input_text], max_gen_len=256, temperature=0.8, top_p=0.95)
         text_out = ""

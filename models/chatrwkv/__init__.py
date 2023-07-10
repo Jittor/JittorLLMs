@@ -1,6 +1,7 @@
 import os, copy, types, gc, sys
 import numpy as np
 from prompt_toolkit import prompt
+import typing as t
 
 from models import LLMModel
 import jittor as jt
@@ -175,11 +176,11 @@ The following is a verbose and detailed conversation between an AI assistant cal
         self.model_tokens = copy.deepcopy(self.all_state[n]['token'])
         return self.all_state[n]['out']
 
-
-    def run(self, message: str, is_web=False) -> str:
+    def run(self, input_text: str, history: t.Optional[list] = None, **kwargs) -> str:
+        is_web = kwargs.get("is_web", False)
         srv = 'dummy_server'
 
-        msg = message.replace('\\n','\n').strip()
+        msg = input_text.replace('\\n','\n').strip()
 
         x_temp = self.GEN_TEMP
         x_top_p = self.GEN_TOP_P
@@ -197,7 +198,7 @@ The following is a verbose and detailed conversation between an AI assistant cal
             x_temp = 5
         if x_top_p <= 0:
             x_top_p = 0
-        
+
         if msg == '+reset':
             out = self.load_all_stat('', 'chat_init')
             self.save_all_stat(srv, 'chat', out)
@@ -227,7 +228,7 @@ The following is a verbose and detailed conversation between an AI assistant cal
                 real_msg = msg[4:].strip()
                 new = f"{self.user}{self.interface} {real_msg}\n\n{self.bot}{self.interface}"
                 # print(f'### qa ###\n[{new}]')
-                
+
                 out = self.run_rnn(self.tokenizer.encode(new))
                 self.save_all_stat(srv, 'gen_0', out)
 
@@ -259,7 +260,7 @@ The following is a verbose and detailed conversation between an AI assistant cal
                     out = self.run_rnn([token], newline_adj=-2)
                 else:
                     out = self.run_rnn([token])
-                
+
                 xxx = self.tokenizer.decode(self.model_tokens[out_last:])
                 if '\ufffd' not in xxx: # avoid utf-8 display issues
                     print(xxx, end='', flush=True)

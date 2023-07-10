@@ -1,17 +1,19 @@
-import os, sys
+import os
+import sys
+import typing as t
+
+import jittor as jt
 import numpy as np
 import torch
-import jittor as jt
 
-from megatron.text_generation_utils import pad_batch, get_batch
 from megatron import get_args
-from megatron import print_rank_0
 from megatron import get_tokenizer
+from megatron import print_rank_0
 from megatron.checkpointing import load_checkpoint
 from megatron.initialize import initialize_megatron
 from megatron.model import GPT2Model
+from megatron.text_generation_utils import pad_batch, get_batch
 from megatron.training import get_model as megatron_get_model
-
 from models import LLMModel
 
 
@@ -153,11 +155,12 @@ class PanGuAlphaModel(LLMModel):
             generate(self.model, context_tokens, self.args, tokenizer, 100, len(text))
             print("")
 
-    def run(self, text, tokenizer=None, history=[]):
+    def run(self, input_text: str, history: t.Optional[list] = None, **kwargs) -> str:
+        tokenizer = kwargs.get("tokenizer", None)
         if tokenizer is None:
             tokenizer = get_tokenizer()
             tokenizer.tokenize("init")
-        text = "问：" + text + "？答："
+        text = "问：" + input_text + "？答："
         context_tokens = tokenizer.tokenize(text)
         return generate(self.model, context_tokens, self.args, tokenizer, 100, len(text))
 

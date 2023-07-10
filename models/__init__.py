@@ -3,6 +3,7 @@ import os
 import sys
 from pathlib import Path
 import traceback
+import typing as t
 
 sys.path.append(str((Path(__file__).parent / 'llama' ).absolute()))
 sys.path.append(str((Path(__file__).parent / 'pangualpha').absolute()))
@@ -24,7 +25,7 @@ class LLMModel:
     def __init__(self) -> None:
         pass
 
-    def run(self, input_text: str) -> str:
+    def run(self, input_text: str, history: t.Optional[list] = None, **kwargs) -> str:
         pass
 
 
