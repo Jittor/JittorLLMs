@@ -38,8 +38,7 @@ class ChatGLMMdoel(LLMModel):
             print(flush=True)
     
     def run_web_demo(self, input_text, history=[]):
-        while True:
-            yield self.run(input_text, history=history)
+        return self.model.stream_chat(self.tokenizer, input_text, history=history)
 
     def run(self, text, history=[]):
         return self.model.chat(self.tokenizer, text, history=history)
