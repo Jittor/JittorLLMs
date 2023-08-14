@@ -9,7 +9,7 @@ jt.flags.use_cuda = 1
 jt.flags.amp_level = 3
 
 from models import LLMModel
-from llama import ModelArgs, Transformer, Tokenizer, LLaMA
+from llama import ModelArgs, Transformer, Tokenizer, LLaMA, LLaMA2
 
 os_name = platform.system()
 clear_command = 'cls' if os_name == 'Windows' else 'clear'
@@ -20,12 +20,15 @@ def load(
     tokenizer_path: str,
     max_seq_len: int,
     max_batch_size: int,
-) -> LLaMA:
+    model_name:str = "llama"
+):
+    assert model_name in ["llama", "llama2"]
     start_time = time.time()
     checkpoints = sorted(Path(ckpt_dir).glob("*.pth"))
     ckpt_path = str(checkpoints[0])
     print("Loading")
-    checkpoint = jt.load(ckpt_path)
+    with jt.flag_scope(use_cuda=0):
+        checkpoint = jt.load(ckpt_path)
     with open(Path(ckpt_dir) / "params.json", "r") as f:
         params = json.loads(f.read())
     
@@ -38,8 +41,11 @@ def load(
     model.load_state_dict(checkpoint)
     model.half()
     model.eval()
-
-    generator = LLaMA(model, tokenizer)
+    
+    if model_name == "llama":
+        generator = LLaMA(model, tokenizer)
+    else:
+        generator = LLaMA2(model, tokenizer)
     print(f"Loaded in {time.time() - start_time:.2f} seconds")
     return generator
 
@@ -52,7 +58,7 @@ class LLaMAModel(LLMModel):
         tokenizer_path = getattr(args, "tokenizer_path", "data/llama/tokenizer.model")
 
         self.generator = load(
-            ckpt_dir, tokenizer_path, max_seq_len=512, max_batch_size=32
+            ckpt_dir, tokenizer_path, max_seq_len=512, max_batch_size=32,model_name=args.model
         )
         jt.gc()
 
@@ -81,7 +87,58 @@ class LLaMAModel(LLMModel):
         history.append([input_text, response])
         yield response, history
 
+class LLaMA2Model(LLMModel):
+    def __init__(self, args) -> None:
+        super().__init__()
+
+        ckpt_dir = getattr(args, "ckpt_dir", "data/llama/7BJ")
+        tokenizer_path = getattr(args, "tokenizer_path", "data/llama/tokenizer.model")
+
+        self.generator = load(
+            ckpt_dir, tokenizer_path, max_seq_len=512, max_batch_size=32,model_name=args.model
+        )
+        jt.gc()
+
+    def chat(self):
+        dialog = []
+        while True:
+            input_text = input("用户输入: ")
+            dialog.append({
+                "role": "user",
+                "content": input_text
+            })
+            with jt.no_grad():
+                results = self.generator.chat_completion([dialog], max_gen_len=128, temperature=0.6, top_p=0.9)
+                result = results[0]['generation']
+                dialog.append(result)
+                print("Assistent:",result['content'], flush=True)
+    
+    def run_web_demo(self, input_text, history=[]):
+        dialog = []
+        for prompt, answer in history:
+            dialog.append({
+                "role": "user",
+                "content": prompt
+            })
+            dialog.append({
+                "role": "assistant",
+                "content": answer
+            })
+            
+        dialog.append({
+                "role": "user",
+                "content": input_text
+            })
+        with jt.no_grad():
+            results = self.generator.chat_completion([dialog], max_gen_len=128, temperature=0.6, top_p=0.9)
+        result = results[0]['generation']
+        response = result['content']
+        history.append([input_text, response])
+        yield response, history
+        
 def get_model(args):
-    args.ckpt_dir = os.path.join(jt.compiler.ck_path, "llama")
-    args.tokenizer_path = os.path.join(jt.compiler.ck_path, "llama", "tokenizer.model")
+    args.ckpt_dir = os.path.join(jt.compiler.ck_path, args.model)
+    args.tokenizer_path = os.path.join(jt.compiler.ck_path, args.model, "tokenizer.model")
+    if args.model == "llama2":
+        return LLaMA2Model(args)
     return LLaMAModel(args)

@@ -33,6 +33,16 @@ def get_llama():
         new_paths.append(download_fromhub(f"jittorhub://{f}", tdir="llama"))
     return new_paths
 
+def get_llama2():
+    llama_file_list = [
+        'llama_consolidated.00.pth',
+        'params.json',
+        'tokenizer.model'
+    ]
+    new_paths = []
+    for f in llama_file_list:
+        new_paths.append(download_fromhub(f"jittorhub://{f}", tdir="llama2"))
+    return new_paths
 
 def get_chatglm():
     chatglm_file_list = [

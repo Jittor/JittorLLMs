@@ -17,7 +17,7 @@ __all__ = [
     "LLMModel"
 ]
 
-availabel_models = ["chatglm", "pangualpha", "llama", "chatrwkv"]
+availabel_models = ["chatglm", "pangualpha", "llama", "chatrwkv","llama2"]
 
 
 class LLMModel:
@@ -42,6 +42,9 @@ def get_model(args) -> LLMModel:
             import transformers
             if transformers.__version__ != '4.26.1':
                 raise RuntimeError(f"transformers 版本不匹配 {transformers.__version__} != 4.26.1, 请运行 'python -m pip install -r models/{model_name}/requirements.txt -i https://pypi.jittor.org/simple' ")
+        
+        if model_name == "llama2":
+            model_name = "llama"
         module = importlib.import_module(f"models.{model_name}")
         return module.get_model(args)
     except ModuleNotFoundError:
