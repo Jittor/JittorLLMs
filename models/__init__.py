@@ -17,7 +17,7 @@ __all__ = [
     "LLMModel"
 ]
 
-availabel_models = ["chatglm", "pangualpha", "llama", "chatrwkv","llama2"]
+availabel_models = ["chatglm", "pangualpha", "llama", "chatrwkv", "llama2", "atom7b"]
 
 
 class LLMModel:

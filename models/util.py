@@ -44,6 +44,9 @@ def get_llama2():
         new_paths.append(download_fromhub(f"jittorhub://{f}", tdir="llama2"))
     return new_paths
 
+def get_atom7b():
+    pass
+
 def get_chatglm():
     chatglm_file_list = [
         'pytorch_model-00005-of-00008.bin',

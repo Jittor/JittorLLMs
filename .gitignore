@@ -28,3 +28,5 @@ dist/
 core
 __data__
 *.bin
+jtllm
+jtllm2
