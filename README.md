@@ -139,9 +139,9 @@ export device_mem_limit=8000000000
 ```
 用户可以自由设定cpu和设备内存的使用量，如果不希望对内存进行限制，可以设置为`-1`。
 ```bash
-# 限制cpu最多使用16G
+# 不限制CPU内存使用
 export cpu_mem_limit=-1
-# 限制device内存（如gpu、tpu等）最多使用8G
+# 限制device内存（如GPU、TPU等）最多使用8G
 export device_mem_limit=-1
 # windows 用户，请使用powershell
 # $env:JT_SAVE_MEM="1"
