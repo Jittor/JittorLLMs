@@ -15,7 +15,7 @@ def build_prompt(history):
         prompt += f"\nChatGLM-6B：{response}"
     return prompt
 
-class ChatGLMMdoel(LLMModel):
+class ChatGLMModel(LLMModel):
     def __init__(self, args) -> None:
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(os.path.dirname(__file__), trust_remote_code=True)
@@ -45,4 +45,4 @@ class ChatGLMMdoel(LLMModel):
         return self.model.chat(self.tokenizer, text, history=history)
 
 def get_model(args):
-    return ChatGLMMdoel(args)
+    return ChatGLMModel(args)
