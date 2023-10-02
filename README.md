@@ -88,7 +88,7 @@ python cli_demo.py [chatglm|pangualpha|llama|chatrwkv|llama2|atom7b]
 <img src="./imgs/atom7b.png"  width="350">
 </center>
 
-目前支持了 `ChatGLM`、`Atom7B` 和 盘古α 的中文对话，`ChatRWKV`,`LLaMA`和`LLaMA2` 支持英文对话，后续会持续更新最新的模型参数以及微调的结果。`MOSS` 大··模型使用方式请参考 [MOSS 官方仓库](#https://github.com/OpenLMLab/MOSS#命令行demo)。
+目前支持了 `ChatGLM`、`Atom7B` 和 盘古α 的中文对话，`ChatRWKV`,`LLaMA`和`LLaMA2` 支持英文对话，后续会持续更新最新的模型参数以及微调的结果。`MOSS` 大模型使用方式请参考 [MOSS 官方仓库](#https://github.com/OpenLMLab/MOSS#命令行demo)。
 
 内存或者显存不够，出现进程被杀死的情况，请参考下方，[限制内存消耗的方法](#配置要求低)。
 
