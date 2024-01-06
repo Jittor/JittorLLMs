@@ -80,7 +80,7 @@ class LLaMAModel(LLMModel):
             with jt.no_grad():
                 for output_text in self.generator.generate([input_text], max_gen_len=256, temperature=0.8, top_p=0.95):
                     print(history + session + output_text, flush=True)
-            history += session + output_text + "\n"
+                    history += session + output_text + "\n"
     
     def run_web_demo(self, input_text, history=[]):
         response = self.run(input_text)
