@@ -187,7 +187,7 @@ pip install torch -i https://pypi.jittor.org/simple
 
 ## 模型支持TODO list
 
-* MOSS
+* [MOSS](https://github.com/OpenLMLab/MOSS/)
 * [BELLE](https://github.com/LianjiaTech/BELLE)
 
 欢迎各位向我们提交请求
