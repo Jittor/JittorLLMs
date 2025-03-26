@@ -3,6 +3,7 @@ from transformers import AutoTokenizer, AutoModel
 from models import LLMModel
 import jittor as jt
 import torch
+import typing as t
 
 os_name = platform.system()
 clear_command = 'cls' if os_name == 'Windows' else 'clear'
@@ -41,8 +42,8 @@ class ChatGLMMdoel(LLMModel):
         while True:
             yield self.run(input_text, history=history)
 
-    def run(self, text, history=[]):
-        return self.model.chat(self.tokenizer, text, history=history)
+    def run(self, input_text: str, history: t.Optional[list] = None, **kwargs) -> str:
+        return self.model.chat(self.tokenizer, input_text, history=history)
 
 def get_model(args):
     return ChatGLMMdoel(args)
